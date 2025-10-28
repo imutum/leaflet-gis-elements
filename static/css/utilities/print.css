@@ -1,0 +1,16 @@
+/**
+ * 打印样式
+ */
+
+@media print {
+    .control-panel {
+        display: none;
+    }
+
+    .leaflet-control-north-arrow,
+    .leaflet-control-scale-bar,
+    .leaflet-control-legend {
+        position: static !important;
+    }
+}
+

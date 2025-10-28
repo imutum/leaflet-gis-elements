@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可拖拽地图元素演示</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- 自定义样式 - 模块化CSS入口 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        
+        .control-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 280px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .control-panel h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 8px;
+        }
+        
+        .control-section {
+            margin-bottom: 20px;
+        }
+        
+        .control-section h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        .control-group {
+            margin-bottom: 12px;
+        }
+        
+        .control-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .control-group input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        
+        .control-group select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .control-group button {
+            width: 100%;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+        
+        .control-group button:hover {
+            background-color: #45a049;
+        }
+        
+        .control-group button:active {
+            background-color: #3d8b40;
+        }
+        
+        .info-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            line-height: 1.5;
+        }
+        
+        .toggle-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1001;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        
+        .panel-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="toggle-panel" onclick="togglePanel()">⚙️</div>
+    
+    <div class="control-panel" id="controlPanel">
+        <h3>🎮 控制面板</h3>
+        
+        <!-- 地图要素控制 -->
+        <div class="control-section">
+            <h4>🗺️ 地图要素显示</h4>
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="showNorthArrow" checked> 指北针
+                </label>
+            </div>
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="showScaleBar" checked> 比例尺
+                </label>
+            </div>
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="showLegend" checked> 图例
+                </label>
+            </div>
+        </div>
+        
+        <!-- 样式控制 -->
+        <div class="control-section">
+            <h4>🎨 样式设置</h4>
+            <div class="control-group">
+                <label for="northArrowStyle">指北针：</label>
+                <select id="northArrowStyle"></select>
+            </div>
+            <div class="control-group">
+                <label for="scaleBarStyle">比例尺：</label>
+                <select id="scaleBarStyle"></select>
+            </div>
+            <div class="control-group">
+                <label for="legendStyle">图例：</label>
+                <select id="legendStyle"></select>
+            </div>
+        </div>
+        
+        <!-- 经纬度格网控制 -->
+        <div class="control-section">
+            <h4>📐 经纬度格网</h4>
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="showGraticule" checked> 显示格网
+                </label>
+            </div>
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="showGraticuleFrame" checked> 显示边框
+                </label>
+            </div>
+            <div class="control-group">
+                <label for="graticuleInterval">格网间隔（度）：</label>
+                <select id="graticuleInterval">
+                    <option value="auto">自动</option>
+                    <option value="0.001">0.001° (约111m)</option>
+                    <option value="0.005">0.005° (约555m)</option>
+                    <option value="0.01">0.01° (约1.1km)</option>
+                    <option value="0.05">0.05° (约5.5km)</option>
+                    <option value="0.1">0.1° (约11km)</option>
+                    <option value="0.5">0.5° (约55km)</option>
+                    <option value="1">1° (约111km)</option>
+                    <option value="5">5° (约555km)</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- 地图导出控制 -->
+        <div class="control-section">
+            <h4>📥 地图导出</h4>
+            
+            <div class="control-group">
+                <label for="exportRange">导出范围：</label>
+                <select id="exportRange">
+                    <option value="graticule">经纬格网范围</option>
+                    <option value="viewport">当前视口范围</option>
+                    <option value="auto">自动识别（含所有要素）</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label style="font-weight: 600; margin-top: 8px; display: block;">导出内容：</label>
+                <label style="margin-left: 10px;">
+                    <input type="checkbox" id="exportIncludeBasemap" checked> 底图图层
+                </label>
+                <label style="margin-left: 10px;">
+                    <input type="checkbox" id="exportIncludeGraticule" checked> 格网及标注
+                </label>
+                <label style="margin-left: 10px;">
+                    <input type="checkbox" id="exportIncludeLegend" checked> 图例
+                </label>
+                <label style="margin-left: 10px;">
+                    <input type="checkbox" id="exportIncludeScaleBar" checked> 比例尺
+                </label>
+                <label style="margin-left: 10px;">
+                    <input type="checkbox" id="exportIncludeNorthArrow" checked> 指北针
+                </label>
+            </div>
+            
+            <div class="control-group">
+                <label for="exportFormat">导出格式：</label>
+                <select id="exportFormat">
+                    <option value="png">PNG（高质量，透明背景）</option>
+                    <option value="jpg">JPG（文件更小）</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <button id="exportMapButton" style="background-color: #2196F3;">
+                    🖼️ 导出地图
+                </button>
+                <button id="previewExportButton" style="background-color: #FF9800; margin-top: 5px;">
+                    👁️ 预览导出范围
+                </button>
+            </div>
+        </div>
+        
+        <div class="info-text">
+            💡 使用提示：<br>
+            • 地图要素可拖动调整位置<br>
+            • 格网边框可拖动和调整大小<br>
+            • 导出前可预览导出范围<br>
+            • 所有设置自动保存
+        </div>
+    </div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- html2canvas - 用于地图导出 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- 工具模块 -->
+    <script src="{{ url_for('static', filename='js/core/utils/coordinate.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/core/utils/storage.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/core/utils/draggable.js') }}"></script>
+    
+    <!-- 核心基类 -->
+    <script src="{{ url_for('static', filename='js/core/base-control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/core/stylable-control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/core/map-exporter.js') }}"></script>
+    
+    <!-- 风格注册器（必须在样式定义前加载） -->
+    <script src="{{ url_for('static', filename='js/style-registry.js') }}"></script>
+    
+    <!-- 指北针样式 -->
+    <script src="{{ url_for('static', filename='js/styles/north-arrow/style-gis.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/styles/north-arrow/style-leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/styles/north-arrow/style-compact.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/styles/north-arrow/style-compass.js') }}"></script>
+    
+    <!-- 比例尺风格 -->
+    <script src="{{ url_for('static', filename='js/styles/scale-bar/style-leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/styles/scale-bar/style-gis.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/styles/scale-bar/style-minimal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/styles/scale-bar/style-double.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/styles/scale-bar/style-striped.js') }}"></script>
+    
+    <!-- 图例风格 -->
+    <script src="{{ url_for('static', filename='js/styles/legend/style-gis.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/styles/legend/style-modern.js') }}"></script>
+    
+    <!-- 经纬度格网风格 -->
+    <script src="{{ url_for('static', filename='js/styles/graticule/style-simple.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/styles/graticule/style-dense.js') }}"></script>
+    
+    <!-- 控件实现 -->
+    <script src="{{ url_for('static', filename='js/controls/north-arrow/north-arrow-control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/controls/scale-bar/scale-bar-control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/controls/legend/legend-control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/controls/graticule/graticule-control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/controls/export/export-control.js') }}"></script>
+    
+    <!-- 主控制器 -->
+    <script src="{{ url_for('static', filename='js/map-controller.js') }}"></script>
+    
+    <script>
+        // 初始化地图
+        const map = L.map('map').setView([39.9042, 116.4074], 10);
+        
+        // 添加底图
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 18
+        }).addTo(map);
+        
+        // 创建示例图层数据
+        const sampleLayers = [
+            {
+                name: '温度分布',
+                type: 'gradient',
+                colors: ['#0000ff', '#00ffff', '#00ff00', '#ffff00', '#ff0000'],
+                labels: ['-10°C', '0°C', '10°C', '20°C', '30°C'],
+                unit: '摄氏度 (°C)'
+            },
+            {
+                name: '降水量',
+                type: 'gradient',
+                colors: ['#ffffff', '#b3e5fc', '#4fc3f7', '#0288d1', '#01579b'],
+                labels: ['0', '25', '50', '75', '100'],
+                unit: '毫米 (mm)'
+            },
+            {
+                name: '人口密度',
+                color: '#ff6b6b',
+                type: 'polygon'
+            },
+            {
+                name: '交通路网',
+                color: '#4ecdc4',
+                type: 'line'
+            },
+            {
+                name: '重点设施',
+                color: '#45b7d1',
+                type: 'point'
+            }
+        ];
+        
+        // 使用MapController管理所有元素
+        window.controller = new MapController(map, {
+            northArrow: {
+                position: 'topleft',
+                style: 'gis',
+                size: 80,
+                draggable: true
+            },
+            scaleBar: {
+                position: 'bottomleft',
+                style: 'gis',
+                maxWidth: 300,
+                draggable: true
+            },
+            legend: {
+                position: 'bottomright',
+                style: 'gis',
+                layers: sampleLayers,
+                draggable: true
+            },
+            graticule: {
+                position: 'topleft',
+                style: 'simple',
+                enabled: true,
+                showLabels: true,
+                draggable: true
+            },
+            export: {
+                position: 'topright',
+                exportArea: 'graticule',
+                format: 'png',
+                quality: 1.0,
+                filename: 'thematic_map'
+            }
+        });
+        
+        // 初始化样式下拉框
+        function initStyleSelectors() {
+            // 指北针样式
+            const northArrowSelect = document.getElementById('northArrowStyle');
+            const northArrowStyles = controller.controls.northArrow.getStylesList();
+            northArrowStyles.forEach(style => {
+                const option = document.createElement('option');
+                option.value = style.id;
+                option.textContent = style.name;
+                if (style.id === controller.controls.northArrow.getCurrentStyle()) {
+                    option.selected = true;
+                }
+                northArrowSelect.appendChild(option);
+            });
+            
+            // 比例尺样式
+            const scaleBarSelect = document.getElementById('scaleBarStyle');
+            const scaleBarStyles = controller.controls.scaleBar.getStylesList();
+            scaleBarStyles.forEach(style => {
+                const option = document.createElement('option');
+                option.value = style.id;
+                option.textContent = style.name;
+                if (style.id === controller.controls.scaleBar.getCurrentStyle()) {
+                    option.selected = true;
+                }
+                scaleBarSelect.appendChild(option);
+            });
+            
+            // 图例样式
+            const legendSelect = document.getElementById('legendStyle');
+            const legendStyles = controller.controls.legend.getStylesList();
+            legendStyles.forEach(style => {
+                const option = document.createElement('option');
+                option.value = style.id;
+                option.textContent = style.name;
+                if (style.id === controller.controls.legend.getCurrentStyle()) {
+                    option.selected = true;
+                }
+                legendSelect.appendChild(option);
+            });
+        }
+        
+        // 切换控制面板显示
+        function togglePanel() {
+            const panel = document.getElementById('controlPanel');
+            panel.classList.toggle('panel-hidden');
+        }
+        
+        // 绑定经纬度格网间隔控制事件
+        function bindGraticuleIntervalEvents() {
+            const intervalSelect = document.getElementById('graticuleInterval');
+            if (intervalSelect) {
+                intervalSelect.addEventListener('change', (e) => {
+                    const value = e.target.value;
+                    if (value === 'auto') {
+                        controller.controls.graticule.lngInterval = null;
+                        controller.controls.graticule.latInterval = null;
+                        controller.controls.graticule.updateGraticule();
+                        console.log('格网间隔设置为：自动');
+                    } else {
+                        const interval = parseFloat(value);
+                        controller.controls.graticule.setIntervals(interval, interval);
+                        console.log(`格网间隔设置为：${interval}°`);
+                    }
+                });
+            }
+        }
+        
+        // 绑定导出控制事件
+        function bindExportEvents() {
+            const exportButton = document.getElementById('exportMapButton');
+            const previewButton = document.getElementById('previewExportButton');
+            const exportRangeSelect = document.getElementById('exportRange');
+            const exportFormatSelect = document.getElementById('exportFormat');
+            
+            // 导出按钮
+            if (exportButton && controller.controls.export) {
+                exportButton.addEventListener('click', async () => {
+                    try {
+                        const exportRange = document.getElementById('exportRange').value;
+                        const includeBasemap = document.getElementById('exportIncludeBasemap').checked;
+                        const includeGraticule = document.getElementById('exportIncludeGraticule').checked;
+                        const includeLegend = document.getElementById('exportIncludeLegend').checked;
+                        const includeScaleBar = document.getElementById('exportIncludeScaleBar').checked;
+                        const includeNorthArrow = document.getElementById('exportIncludeNorthArrow').checked;
+                        const format = document.getElementById('exportFormat').value;
+                        
+                        // 设置导出区域
+                        if (exportRange === 'graticule') {
+                            controller.controls.export.setExportArea('graticule');
+                        } else if (exportRange === 'viewport') {
+                            controller.controls.export.setExportArea('viewport');
+                        } else if (exportRange === 'auto') {
+                            controller.controls.export.setExportArea('graticule'); // 自动识别使用格网范围
+                        }
+                        
+                        // 设置导出格式
+                        controller.controls.export.setFormat(format);
+                        
+                        // 根据选项设置包含的控件
+                        const includeControls = [];
+                        if (includeLegend) includeControls.push('.leaflet-control-legend');
+                        if (includeScaleBar) includeControls.push('.leaflet-control-scale-bar');
+                        if (includeNorthArrow) includeControls.push('.leaflet-control-north-arrow');
+                        if (includeGraticule) {
+                            includeControls.push('.graticule-label');
+                            includeControls.push('.graticule-frame');
+                        }
+                        controller.controls.export.includeControls = includeControls;
+                        
+                        // 执行导出
+                        await controller.controls.export.export();
+                        console.log('地图导出成功');
+                    } catch (error) {
+                        console.error('导出失败:', error);
+                        alert('导出失败：' + error.message);
+                    }
+                });
+            }
+            
+            // 预览按钮
+            if (previewButton && controller.controls.export) {
+                previewButton.addEventListener('click', () => {
+                    controller.controls.export.togglePreview();
+                });
+            }
+            
+            // 导出范围选择
+            if (exportRangeSelect && controller.controls.export) {
+                exportRangeSelect.addEventListener('change', (e) => {
+                    const value = e.target.value;
+                    if (value === 'graticule') {
+                        controller.controls.export.setExportArea('graticule');
+                        console.log('导出范围：经纬格网范围');
+                    } else if (value === 'viewport') {
+                        controller.controls.export.setExportArea('viewport');
+                        console.log('导出范围：当前视口范围');
+                    } else if (value === 'auto') {
+                        controller.controls.export.setExportArea('auto');
+                        console.log('导出范围：自动识别（使用格网范围）');
+                    }
+                });
+            }
+            
+            // 格式选择
+            if (exportFormatSelect && controller.controls.export) {
+                exportFormatSelect.addEventListener('change', (e) => {
+                    controller.controls.export.setFormat(e.target.value);
+                    console.log('导出格式：' + e.target.value.toUpperCase());
+                });
+            }
+        }
+        
+        // 初始化
+        initStyleSelectors();
+        bindGraticuleIntervalEvents();
+        bindExportEvents();
+        
+        // 默认显示所有控件
+        controller.show('northArrow');
+        controller.show('scaleBar');
+        controller.show('legend');
+        controller.show('graticule'); // 添加格网控件到地图
+        
+        // 格网线和容器默认都显示（已在初始化时设置）
+        
+        console.log('地图元素演示页面已加载');
+        console.log('控制器:', controller);
+    </script>
+</body>
+</html>

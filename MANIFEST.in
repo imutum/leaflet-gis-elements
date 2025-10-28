@@ -1,0 +1,15 @@
+# 包含静态文件和模板
+recursive-include static *
+recursive-include templates *
+
+# 包含文档
+include README.md
+include INTEGRATION.md
+include LICENSE
+
+# 排除不必要的文件
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude .DS_Store
+global-exclude *.swp
+

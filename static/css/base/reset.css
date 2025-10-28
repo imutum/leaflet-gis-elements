@@ -1,0 +1,19 @@
+/**
+ * CSS重置
+ * 基础样式重置和标准化
+ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+

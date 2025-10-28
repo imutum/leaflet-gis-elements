@@ -1,0 +1,33 @@
+/**
+ * 响应式设计
+ */
+
+@media (max-width: 768px) {
+    .control-panel {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        min-width: auto;
+    }
+
+    .leaflet-control-north-arrow,
+    .leaflet-control-scale-bar {
+        font-size: var(--font-size-sm);
+    }
+}
+
+@media (max-width: 480px) {
+    .control-panel {
+        padding: var(--spacing-lg);
+    }
+
+    .control-panel h2 {
+        font-size: 16px;
+    }
+
+    .control-group {
+        padding: var(--spacing-md);
+    }
+}
+

@@ -1,0 +1,22 @@
+/**
+ * 自定义滚动条样式
+ */
+
+.control-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.control-panel::-webkit-scrollbar-track {
+    background: var(--bg-lighter);
+    border-radius: var(--radius-md);
+}
+
+.control-panel::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: var(--radius-md);
+}
+
+.control-panel::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
