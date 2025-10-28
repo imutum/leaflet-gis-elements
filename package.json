@@ -1,0 +1,58 @@
+{
+    "name": "leaflet-gis-elements",
+    "version": "1.0.0",
+    "description": "可拖拽的 Leaflet 地图控件库 - 包含指北针、比例尺、图例、经纬网格等",
+    "main": "dist/leaflet-gis-elements.js",
+    "unpkg": "dist/leaflet-gis-elements.min.js",
+    "jsdelivr": "dist/leaflet-gis-elements.min.js",
+    "style": "dist/leaflet-gis-elements.css",
+    "files": [
+        "dist/**/*",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "webpack --mode production",
+        "build:dev": "webpack --mode development",
+        "watch": "webpack --mode development --watch",
+        "clean": "rimraf dist",
+        "demo": "live-server --port=8080 --open=/examples/demo.html",
+        "serve": "live-server --port=8080",
+        "prepublishOnly": "npm run clean && npm run build"
+    },
+    "keywords": [
+        "leaflet",
+        "gis",
+        "map",
+        "control",
+        "north-arrow",
+        "scale-bar",
+        "legend",
+        "graticule",
+        "export"
+    ],
+    "author": "imutum",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/leaflet-gis-elements.git"
+    },
+    "peerDependencies": {
+        "leaflet": "^1.9.0"
+    },
+    "devDependencies": {
+        "css-loader": "^6.8.1",
+        "live-server": "^1.2.2",
+        "mini-css-extract-plugin": "^2.7.6",
+        "postcss": "^8.4.31",
+        "postcss-loader": "^6.2.1",
+        "postcss-prefix-selector": "^1.16.0",
+        "rimraf": "^5.0.5",
+        "terser-webpack-plugin": "^5.3.9",
+        "webpack": "^5.88.2",
+        "webpack-cli": "^5.1.4"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}

@@ -1,0 +1,42 @@
+# Python files - 演示应用
+demo/
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Source files (只发布构建后的文件)
+src/
+
+# Documentation (保留主README)
+docs/
+
+# Config files
+webpack.config.js
+postcss.config.js
+.gitignore
+.npmignore
+
+# Development
+node_modules/
+.vscode/
+.idea/
+*.log
+*.map
+
+# Examples
+examples/
+
+# Old structure
+static/
+templates/
+leaflet_gis_elements/
+app.py
+demo.html
+
+# 只发布这些文件
+!dist/**/*
+!README.md
+!LICENSE
+!package.json
+
+
