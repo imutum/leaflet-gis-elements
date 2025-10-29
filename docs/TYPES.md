@@ -22,7 +22,8 @@
 2. **ScaleBar** - 比例尺控件  
 3. **Legend** - 图例控件
 4. **Graticule** - 经纬网控件
-5. **Export** - 地图导出控件
+5. **MapInfo** - 地图注记控件
+6. **ExportPreview** - 地图导出预览控件
 
 ---
 
@@ -536,67 +537,127 @@ graticule.enable();               // 启用显示
 
 ---
 
-## 📤 5. 导出控件 (Export)
+## 🗺️ 5. 地图注记控件 (MapInfo)
 
 ### 类型定义
 
 ```typescript
-interface ExportOptions {
-  // 控件位置，默认: 'topright'
+interface MapInfoOptions {
+  // 控件位置，默认: 'topleft'
   position?: string;
   
-  // 导出区域: 'graticule' | 'viewport' | 'auto'
-  // - 'graticule': 仅导出格网范围（包括边框和标签）
-  // - 'viewport': 导出整个视口
-  // - 'auto': 自动计算包含所有控件的最小范围
-  // 默认: 'graticule'
-  exportArea?: string;
+  // 是否可拖动，默认: true
+  draggable?: boolean;
   
-  // 导出格式: 'png' | 'jpg'，默认: 'png'
-  format?: string;
+  // 样式名称: 'professional' | 'compact'
+  style?: string;
   
-  // 图片质量（0-1），默认: 1.0
-  quality?: number;
+  // === 地图信息 ===
+  // 地图标题
+  title?: string;
   
-  // 文件名前缀，默认: 'thematic_map'
-  filename?: string;
+  // 副标题
+  subtitle?: string;
   
-  // 要排除的元素（CSS选择器数组）
-  // 默认排除: 缩放栏、控制面板、版权信息、导出按钮
-  excludeSelectors?: string[];
+  // 制图者
+  author?: string;
   
-  // 要包含的控件（CSS选择器数组，白名单）
-  // 默认包含: 图例、比例尺、指北针、格网
-  includeControls?: string[];
+  // 制图单位
+  organization?: string;
+  
+  // 制图日期（默认当前日期）
+  date?: string;
+  
+  // 数据来源
+  dataSource?: string;
+  
+  // 投影坐标系，默认: 'WGS84 / EPSG:4326'
+  projection?: string;
+  
+  // 地图比例尺，默认: '1:100000'
+  scale?: string;
+  
+  // 备注说明
+  notes?: string;
+  
+  // === 显示配置 ===
+  // 是否显示标题，默认: true
+  showTitle?: boolean;
+  
+  // 是否显示副标题，默认: true
+  showSubtitle?: boolean;
+  
+  // 是否显示制图者，默认: true
+  showAuthor?: boolean;
+  
+  // 是否显示制图单位，默认: true
+  showOrganization?: boolean;
+  
+  // 是否显示日期，默认: true
+  showDate?: boolean;
+  
+  // 是否显示数据来源，默认: true
+  showDataSource?: boolean;
+  
+  // 是否显示投影，默认: true
+  showProjection?: boolean;
+  
+  // 是否显示比例尺，默认: true
+  showScale?: boolean;
+  
+  // 是否显示备注，默认: true
+  showNotes?: boolean;
+  
+  // === 尺寸设置 ===
+  // 最大宽度，默认: 400
+  maxWidth?: number;
+  
+  // 最小宽度，默认: 200
+  minWidth?: number;
 }
 
-interface ExportControl {
+interface MapInfoControl {
   // 添加到地图
   addTo(map: L.Map): this;
   
   // 从地图移除
   remove(): this;
   
-  // 执行导出（异步）
-  export(): Promise<void>;
+  // === 单项设置 ===
+  setTitle(title: string): this;
+  setSubtitle(subtitle: string): this;
+  setAuthor(author: string): this;
+  setOrganization(organization: string): this;
+  setDate(date: string): this;
+  setDataSource(dataSource: string): this;
+  setProjection(projection: string): this;
+  setScale(scale: string): this;
+  setNotes(notes: string): this;
   
-  // 切换预览边框显示
-  togglePreview(): void;
+  // 批量设置信息
+  setInfo(info: Partial<MapInfoOptions>): this;
   
-  // 设置导出区域
-  setExportArea(area: 'graticule' | 'viewport' | 'auto'): void;
+  // === 显示控制 ===
+  showField(field: string): this;
+  hideField(field: string): this;
+  setShowConfig(config: object): this;
   
-  // 设置导出格式
-  setFormat(format: 'png' | 'jpg'): void;
+  // === 尺寸设置 ===
+  setMaxWidth(width: number): this;
+  setMinWidth(width: number): this;
   
-  // 设置导出质量
-  setQuality(quality: number): void;
+  // === 获取信息 ===
+  getInfo(): object;
+  getShowConfig(): object;
   
-  // 设置文件名
-  setFilename(filename: string): void;
+  // 切换样式
+  setStyle(styleName: string): void;
   
-  // 是否正在导出
-  isExporting: boolean;
+  // 获取当前样式
+  getStyle(): string;
+  
+  // 获取可用样式列表
+  getAvailableStyles(): string[];
 }
 ```
 
@@ -604,19 +665,186 @@ interface ExportControl {
 
 ```javascript
 // 工厂函数（推荐）
-const exportControl = L.control.export({
+const mapInfo = L.control.mapInfo({
+  position: 'topleft',
+  style: 'professional',
+  title: '北京市土地利用分布图',
+  subtitle: '2024年度',
+  author: '张三',
+  organization: '地理信息研究所',
+  date: '2024-10-29',
+  dataSource: '国家地理信息中心',
+  projection: 'WGS84 / EPSG:4326',
+  scale: '1:50000',
+  notes: '仅供参考',
+  maxWidth: 400
+}).addTo(map);
+
+// 动态更新
+mapInfo.setTitle('新标题');
+mapInfo.setInfo({
+  author: '李四',
+  date: '2024-11-01'
+});
+
+// 控制显示
+mapInfo.hideField('author');
+mapInfo.showField('author');
+```
+
+### 可用样式
+
+- `'professional'` - 专业风格（默认）
+- `'compact'` - 紧凑型
+
+---
+
+## 📤 6. 导出预览控件 (ExportPreview)
+
+### 类型定义
+
+```typescript
+interface ExportPreviewOptions {
+  // 控件位置，默认: 'topright'
+  position?: string;
+  
+  // 样式名称: 'default'
+  style?: string;
+  
+  // === 导出设置 ===
+  // 导出格式: 'png' | 'jpg'，默认: 'png'
+  format?: string;
+  
+  // 图片质量（0-1），默认: 1.0
+  quality?: number;
+  
+  // 文件名前缀，默认: 'map_export'
+  filename?: string;
+  
+  // 导出缩放比例，默认: 2
+  scale?: number;
+  
+  // === 边界设置 ===
+  // 导出边界（像素坐标）
+  exportBounds?: {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  };
+  
+  // 是否自动计算边界，默认: true
+  autoCalculateBounds?: boolean;
+  
+  // 边界计算模式: 'graticule' | 'all' | 'viewport'
+  // - 'graticule': 仅计算格网范围
+  // - 'all': 计算所有GIS控件范围
+  // - 'viewport': 使用整个视口
+  // 默认: 'graticule'
+  boundsMode?: string;
+}
+
+interface ExportPreviewControl {
+  // 添加到地图
+  addTo(map: L.Map): this;
+  
+  // 从地图移除
+  remove(): this;
+  
+  // === 预览控制 ===
+  // 显示预览边框
+  showPreview(): void;
+  
+  // 隐藏预览边框
+  hidePreview(): void;
+  
+  // 切换预览边框显示
+  togglePreview(): void;
+  
+  // 预览是否可见
+  previewVisible: boolean;
+  
+  // === 导出执行 ===
+  // 执行导出（异步）
+  export(): Promise<void>;
+  
+  // === 白名单管理 ===
+  // 添加要导出的图层
+  addLayer(layer: L.Layer): this;
+  
+  // 添加要导出的UI元素
+  addUIElement(element: HTMLElement): this;
+  
+  // 移除图层
+  removeLayer(layer: L.Layer): this;
+  
+  // 移除UI元素
+  removeUIElement(element: HTMLElement): this;
+  
+  // 清空白名单
+  clearWhitelist(): this;
+  
+  // === 边界设置 ===
+  // 设置导出边界
+  setExportBounds(rect: {left: number, top: number, width: number, height: number}): this;
+  
+  // 设置边界计算模式
+  setBoundsMode(mode: 'graticule' | 'all' | 'viewport'): this;
+  
+  // 重新计算边界
+  recalculateBounds(): this;
+  
+  // === 导出配置 ===
+  // 设置导出格式
+  setFormat(format: 'png' | 'jpg'): this;
+  
+  // 设置导出质量
+  setQuality(quality: number): this;
+  
+  // 设置文件名
+  setFilename(filename: string): this;
+  
+  // 设置缩放比例
+  setScale(scale: number): this;
+  
+  // 切换样式
+  setStyle(styleName: string): void;
+  
+  // 获取当前样式
+  getStyle(): string;
+}
+```
+
+### 创建方法
+
+```javascript
+// 工厂函数（推荐）
+const exportControl = L.control.exportPreview({
   position: 'topright',
-  exportArea: 'auto',      // 自动计算范围
+  boundsMode: 'graticule',  // 导出格网范围
   format: 'png',
   quality: 1.0,
+  scale: 2,
   filename: 'my_map'
 }).addTo(map);
+
+// 显示预览边框（可拖动调整大小）
+exportControl.showPreview();
 
 // 执行导出
 exportControl.export();
 
-// 显示预览边框（可拖动调整）
-exportControl.togglePreview();
+// 自定义导出范围
+exportControl.setExportBounds({
+  left: 100,
+  top: 100,
+  width: 800,
+  height: 600
+});
+
+// 切换边界计算模式
+exportControl.setBoundsMode('all');  // 包含所有GIS控件
+exportControl.recalculateBounds();   // 重新计算
 ```
 
 ### 重要依赖
@@ -627,11 +855,11 @@ exportControl.togglePreview();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 ```
 
-### 导出区域说明
+### 边界计算模式说明
 
 - **`'graticule'`**: 自动计算格网边框和标签的范围，适合导出经纬网专题图
+- **`'all'`**: 智能计算包含所有可见GIS控件（图例、比例尺、指北针、格网等）的最小范围
 - **`'viewport'`**: 导出整个地图视口
-- **`'auto'`**: 智能计算包含所有可见控件（图例、比例尺、指北针、格网等）的最小范围
 
 ---
 
@@ -659,24 +887,33 @@ interface StyleObject {
 
 interface StyleRegistry {
   // 注册样式
-  register(controlType: string, styleName: string, styleObject: StyleObject): void;
+  register(controlType: string, styleId: string, styleObject: StyleObject): void;
   
   // 获取样式
-  get(controlType: string, styleName: string): StyleObject | null;
+  getStyle(controlType: string, styleId: string): StyleObject | null;
   
   // 获取某类型的所有样式
   getStyles(controlType: string): Record<string, StyleObject>;
   
-  // 列出某类型的样式名称
-  list(controlType: string): string[];
+  // 列出某类型的样式名称列表
+  list(controlType?: string): string[] | object;
   
   // 检查样式是否存在
-  has(controlType: string, styleName: string): boolean;
+  hasStyle(controlType: string, styleId: string): boolean;
 }
 
 // 全局访问
 L.GISElements.StyleRegistry: StyleRegistry;
 ```
+
+### 支持的控件类型
+
+- `'north-arrow'` - 指北针控件
+- `'scale-bar'` - 比例尺控件
+- `'legend'` - 图例控件
+- `'graticule'` - 经纬网控件
+- `'map-info'` - 地图注记控件
+- `'export-preview'` - 导出预览控件
 
 ### 自定义样式示例
 
@@ -699,6 +936,15 @@ L.GISElements.StyleRegistry.register('scale-bar', 'custom', {
 const scaleBar = L.control.scaleBar({
   style: 'custom'
 }).addTo(map);
+
+// 查看所有可用样式
+const styles = L.GISElements.StyleRegistry.list('scale-bar');
+console.log(styles); // [{id: 'gis', name: 'GIS专业风格'}, ...]
+
+// 检查样式是否存在
+if (L.GISElements.StyleRegistry.hasStyle('scale-bar', 'custom')) {
+  console.log('自定义样式已注册');
+}
 ```
 
 ---
@@ -819,10 +1065,18 @@ const graticule = L.control.graticule({
   showLabels: true
 }).addTo(map);
 
-// 6. 添加导出按钮
-const exportControl = L.control.export({
+// 6. 添加地图注记
+const mapInfo = L.control.mapInfo({
+  position: 'topleft',
+  title: '北京市土地利用图',
+  author: '张三',
+  date: '2024-10-29'
+}).addTo(map);
+
+// 7. 添加导出按钮
+const exportControl = L.control.exportPreview({
   position: 'topright',
-  exportArea: 'auto',
+  boundsMode: 'all',
   format: 'png'
 }).addTo(map);
 ```
@@ -849,11 +1103,19 @@ graticule.setInterval(0.5);
 graticule.disable();
 setTimeout(() => graticule.enable(), 5000);
 
+// 更新地图注记
+mapInfo.setTitle('新标题');
+mapInfo.setInfo({
+  author: '李四',
+  organization: '地理信息研究所'
+});
+
 // 导出地图并自定义设置
-exportControl.setExportArea('graticule');
+exportControl.setBoundsMode('graticule');
 exportControl.setFormat('jpg');
 exportControl.setQuality(0.9);
-exportControl.export();
+exportControl.showPreview();  // 显示预览边框
+exportControl.export();       // 执行导出
 ```
 
 ---
@@ -926,38 +1188,47 @@ map.on('controlremove', (e) => {
 ## 🔗 命名空间结构
 
 ```
-window.LeafletGISElements
-├── version: string
-├── MapController: class
-├── controls: object
-│   ├── NorthArrow: class
-│   ├── ScaleBar: class
-│   ├── Legend: class
-│   ├── Graticule: class
-│   └── Export: class
-├── utils: object
-│   ├── CoordinateFormatter: object
-│   ├── StorageUtils: object
-│   └── Draggable: class
-├── StyleRegistry: object
-├── createController: function
-├── getAvailableStyles: function
-├── configure: function
-└── config: object
+L.GISElements (全局命名空间)
+├── version: string                        版本号
+├── MapController: class                   地图控制器
+├── BaseControl: class                     基础控件类
+├── StylableControl: class                 可样式化控件类
+├── StyleRegistry: object                  样式注册器
+│   ├── register(type, id, style): void
+│   ├── getStyle(type, id): object
+│   ├── getStyles(type): object
+│   ├── hasStyle(type, id): boolean
+│   └── list(type?): array|object
+├── MapExporter: class                     地图导出器
+├── BoundsCalculator: class                边界计算器
+├── SVGFixer: class                        SVG修复工具
+├── ExportConfig: object                   导出配置常量
+├── Notification: object                   通知工具
+├── Draggable: class                       拖拽工具
+├── Resizable: class                       调整大小工具
+├── StorageUtils: object                   存储工具
+├── CoordinateFormatter: object            坐标格式化工具
+├── Constants: object                      常量定义
+├── createController: function             创建控制器
+├── getAvailableStyles: function           获取可用样式
+├── configure: function                    全局配置
+└── config: object                         配置对象
 
 L.Control (Leaflet扩展)
-├── NorthArrow: class
-├── ScaleBar: class
-├── Legend: class
-├── Graticule: class
-└── Export: class
+├── NorthArrow: class                      指北针控件
+├── ScaleBar: class                        比例尺控件
+├── Legend: class                          图例控件
+├── Graticule: class                       经纬网控件
+├── MapInfo: class                         地图注记控件
+└── ExportPreview: class                   导出预览控件
 
 L.control (工厂方法)
-├── northArrow: function
-├── scaleBar: function
-├── legend: function
-├── graticule: function
-└── export: function
+├── northArrow(options): Control           创建指北针
+├── scaleBar(options): Control             创建比例尺
+├── legend(options): Control               创建图例
+├── graticule(options): Control            创建经纬网
+├── mapInfo(options): Control              创建地图注记
+└── exportPreview(options): Control        创建导出预览
 ```
 
 ---
@@ -986,16 +1257,22 @@ L.control (工厂方法)
    "根据用户选择动态更新图例内容，显示不同的图层分类"
    ```
 
+5. **地图注记**:
+   ```
+   "添加专业的地图注记，包含标题、制图者、数据来源和坐标系统信息"
+   ```
+
 ### 常见模式
 
 ```javascript
-// 模式1: 快速初始化
+// 模式1: 快速初始化所有控件
 const controls = {
   northArrow: L.control.northArrow({position: 'topleft'}).addTo(map),
   scaleBar: L.control.scaleBar({position: 'bottomleft'}).addTo(map),
   legend: L.control.legend({position: 'bottomright'}).addTo(map),
   graticule: L.control.graticule().addTo(map),
-  export: L.control.export({position: 'topright'}).addTo(map)
+  mapInfo: L.control.mapInfo({position: 'topleft'}).addTo(map),
+  exportPreview: L.control.exportPreview({position: 'topright'}).addTo(map)
 };
 
 // 模式2: 条件加载
@@ -1007,11 +1284,24 @@ function addControl(type, options) {
 // 模式3: 批量配置
 const controlConfig = {
   northArrow: {position: 'topleft', size: 80},
-  scaleBar: {position: 'bottomleft', style: 'gis'}
+  scaleBar: {position: 'bottomleft', style: 'gis'},
+  mapInfo: {position: 'topleft', title: '专题地图'}
 };
 
 Object.entries(controlConfig).forEach(([type, opts]) => {
   L.control[type](opts).addTo(map);
+});
+
+// 模式4: 使用MapController统一管理
+const controller = L.GISElements.createController(map, {
+  controls: {
+    northArrow: {enabled: true, size: 80},
+    scaleBar: {enabled: true, style: 'gis'},
+    legend: {enabled: true},
+    graticule: {enabled: true, interval: 1},
+    mapInfo: {enabled: true, title: '我的地图'},
+    exportPreview: {enabled: true}
+  }
 });
 ```
 
