@@ -34,12 +34,7 @@ dist/
 *.map
 
 # Old structure (待清理)
-static/
-templates/
-leaflet_gis_elements/
-app.py
-demo.html
-src/bundle-entry.js
+docs/任务.md
 
 # IDE
 .vscode/
