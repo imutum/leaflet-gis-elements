@@ -1,16 +1,27 @@
 /**
  * 打印样式
+ * 确保控件在打印时正确显示
  */
 
 @media print {
-    .control-panel {
-        display: none;
-    }
 
+    /* 控件定位调整 */
     .leaflet-control-north-arrow,
     .leaflet-control-scale-bar,
     .leaflet-control-legend {
-        position: static !important;
+        position: static;
+    }
+
+    /* 地图注记打印优化 */
+    .leaflet-control-map-info {
+        background: white;
+        box-shadow: none;
+        border: 1px solid #333;
+    }
+
+    /* 隐藏交互元素 */
+    .lge-resize-handle,
+    .lge-toggle-switch {
+        display: none;
     }
 }
-

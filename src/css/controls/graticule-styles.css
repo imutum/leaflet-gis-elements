@@ -4,14 +4,15 @@
 
 /* 基础样式 */
 .leaflet-control-graticule {
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: var(--lge-bg-white);
+    border-radius: var(--lge-radius-md);
+    box-shadow: var(--lge-shadow-md);
     cursor: move;
+    user-select: none;
 }
 
 /* 格网边框样式（内层边框，被刻度标签包围，用于格网展示） */
-.graticule-frame {
+.lge-graticule-frame {
     cursor: move;
     background: transparent;
     box-sizing: border-box;
@@ -19,263 +20,88 @@
 }
 
 /* 调整大小控制点 */
-.resize-handle {
+.lge-resize-handle {
     cursor: nwse-resize;
     box-sizing: border-box;
+    /* 增强可访问性：确保触摸目标足够大 */
+    min-width: 20px;
+    min-height: 20px;
 }
 
-.resize-handle.resize-handle-topleft {
+.lge-resize-handle:focus-visible {
+    outline: var(--lge-focus-width) solid var(--lge-focus-color);
+    outline-offset: var(--lge-focus-offset);
+}
+
+.lge-resize-handle.lge-resize-handle-topleft {
     cursor: nwse-resize;
 }
 
-.resize-handle.resize-handle-topright {
+.lge-resize-handle.lge-resize-handle-topright {
     cursor: nesw-resize;
 }
 
-.resize-handle.resize-handle-bottomleft {
+.lge-resize-handle.lge-resize-handle-bottomleft {
     cursor: nesw-resize;
 }
 
-.resize-handle.resize-handle-bottomright {
+.lge-resize-handle.lge-resize-handle-bottomright {
     cursor: nwse-resize;
 }
 
 /* 格网标注通用样式 */
-.graticule-label {
+.lge-graticule-label {
     background: transparent;
     border: none;
     pointer-events: none;
     z-index: 1000;
 }
 
-.graticule-label span {
+.lge-graticule-label span {
     display: inline-block;
-    padding: 2px 6px;
+    padding: 2px var(--lge-spacing-xs);
     background: rgba(255, 255, 255, 0.9);
-    border-radius: 3px;
-    font-size: 11px;
+    border-radius: var(--lge-radius-sm);
+    font-size: var(--lge-font-size-sm);
     font-weight: 600;
-    color: #333;
+    color: var(--lge-text-primary);
     white-space: nowrap;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 /* 经度标签位置 */
-.graticule-label-longitude.graticule-label-top span {
+.lge-graticule-label-longitude.lge-graticule-label-top span {
     transform: translate(-50%, -150%);
 }
 
-.graticule-label-longitude.graticule-label-bottom span {
+.lge-graticule-label-longitude.lge-graticule-label-bottom span {
     transform: translate(-50%, 50%);
 }
 
 /* 纬度标签位置 */
-.graticule-label-latitude.graticule-label-left span {
+.lge-graticule-label-latitude.lge-graticule-label-left span {
     transform: translate(-110%, -50%);
 }
 
-.graticule-label-latitude.graticule-label-right span {
+.lge-graticule-label-latitude.lge-graticule-label-right span {
     transform: translate(10%, -50%);
 }
 
-/* ==================== 简单样式 ==================== */
-.graticule-simple-container {
-    padding: 8px 12px;
-    min-width: 120px;
-}
-
-.graticule-simple-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.graticule-simple-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-}
-
-/* 开关按钮 */
-.graticule-simple-switch {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-    cursor: pointer;
-}
-
-.graticule-simple-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.graticule-simple-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.3s;
-    border-radius: 20px;
-}
-
-.graticule-simple-slider:before {
-    position: absolute;
-    content: "";
-    height: 14px;
-    width: 14px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.3s;
-    border-radius: 50%;
-}
-
-.graticule-simple-switch input:checked + .graticule-simple-slider {
-    background-color: #4CAF50;
-}
-
-.graticule-simple-switch input:checked + .graticule-simple-slider:before {
-    transform: translateX(20px);
-}
-
-/* 简单样式的间隔信息 */
-.graticule-simple-info {
-    margin-top: 8px;
-    padding-top: 6px;
-    border-top: 1px solid #f0f0f0;
-    font-size: 12px;
-}
-
-.graticule-interval-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 4px 0;
-}
-
-.graticule-interval-label {
-    color: #666;
-    font-size: 11px;
-}
-
-.graticule-interval-value {
-    color: #333;
-    font-weight: 500;
-    font-size: 11px;
-}
-
-/* 简单样式的标注 */
-.graticule-label-simple span {
+/* ==================== 样式变体 - 标签外观 ==================== */
+/* 简单样式的标注 - 淡色背景 */
+.lge-graticule-label-simple span {
     background: rgba(255, 255, 255, 0.7);
-    color: #666;
-    font-size: 10px;
+    color: var(--lge-text-muted);
+    font-size: var(--lge-font-size-xs);
 }
 
-/* ==================== 密集样式 ==================== */
-.graticule-dense-container {
-    padding: 10px 14px;
-    min-width: 150px;
-}
-
-.graticule-dense-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 6px;
-}
-
-.graticule-dense-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-}
-
-.graticule-dense-info {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #eee;
-}
-
-.graticule-dense-interval {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 12px;
-    color: #666;
-}
-
-.graticule-dense-interval span {
-    display: block;
-}
-
-/* 密集样式开关 */
-.graticule-dense-switch {
-    position: relative;
-    display: inline-block;
-    width: 44px;
-    height: 22px;
-    cursor: pointer;
-}
-
-.graticule-dense-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.graticule-dense-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.3s;
-    border-radius: 22px;
-}
-
-.graticule-dense-slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.3s;
-    border-radius: 50%;
-}
-
-.graticule-dense-switch input:checked + .graticule-dense-slider {
-    background-color: #4A90E2;
-}
-
-.graticule-dense-switch input:checked + .graticule-dense-slider:before {
-    transform: translateX(22px);
-}
-
-/* 密集样式的标注 */
-.graticule-label-dense span {
+/* 密集样式的标注 - 蓝色背景 */
+.lge-graticule-label-dense span {
     background: rgba(74, 144, 226, 0.9);
-    color: white;
-    font-size: 11px;
+    color: var(--lge-bg-white);
+    font-size: var(--lge-font-size-sm);
     font-weight: 600;
 }
 
-/* 响应式调整 */
-@media (max-width: 768px) {
-    .graticule-label span {
-        font-size: 9px;
-        padding: 1px 4px;
-    }
-}
-
+/* 响应式调整已移至 utilities/responsive.css 统一管理 */

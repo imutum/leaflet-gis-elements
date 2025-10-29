@@ -1,80 +1,91 @@
 /**
- * 经纬度格网控件
- * 在地图上显示经纬度网格线和标注
- * 支持可视化矩形边框，可拖动和调整大小
+ * 经纬度格网控件（重构版）
+ * 继承自L.GISElements.StylableControl
+ * 
+ * 功能：
+ * 1. 绘制经纬度网格线
+ * 2. 显示经纬度标签
+ * 3. 可拖动、可调整大小的边框
+ * 4. 支持样式切换
  */
 
-class GraticuleControl {
+// 确保命名空间已初始化
+L.GISElements = L.GISElements || {};
+
+class GraticuleControl extends L.GISElements.StylableControl {
     constructor(options = {}) {
+        super({
+            position: options.position || 'topleft',
+            draggable: false,  // 边框自己处理拖动
+            storageKey: 'graticulePosition',
+            style: options.style || 'simple'
+        });
+
         // 格网配置
         this.interval = options.interval || null;
-        this.lngInterval = options.lngInterval || options.interval || null;
-        this.latInterval = options.latInterval || options.interval || null;
+        this.lngInterval = options.lngInterval || null;
+        this.latInterval = options.latInterval || null;
         this.showLabels = options.showLabels !== false;
 
-        // 经线样式
-        this.meridianColor = options.meridianColor || options.color || '#666';
-        this.meridianWeight = options.meridianWeight || options.weight || 1;
-        this.meridianOpacity = options.meridianOpacity || options.opacity || 0.5;
-        this.meridianDashArray = options.meridianDashArray || null; // 线型，如 '5, 5' 表示虚线
+        // 标签位置配置
+        this.labelPositions = options.labelPositions || {
+            top: true,      // 顶部标签（经度）
+            bottom: true,   // 底部标签（经度）
+            left: true,     // 左侧标签（纬度）
+            right: true     // 右侧标签（纬度）
+        };
 
-        // 纬线样式
-        this.parallelColor = options.parallelColor || options.color || '#666';
-        this.parallelWeight = options.parallelWeight || options.weight || 1;
-        this.parallelOpacity = options.parallelOpacity || options.opacity || 0.5;
-        this.parallelDashArray = options.parallelDashArray || null;
-
-        // 标签样式
-        this.labelFontSize = options.labelFontSize || 11; // 字体大小（px）
-        this.labelFontFamily = options.labelFontFamily || 'Arial, sans-serif'; // 字体类型
-
-        // 兼容旧API
-        this.color = options.color || '#666';
-        this.weight = options.weight || 1;
-        this.opacity = options.opacity || 0.5;
-
-        // 格网窗格配置
-        this.frameEnabled = options.frameEnabled !== false; // 是否显示边框
-        this.frameColor = options.frameColor || '#333';
-        this.frameWeight = options.frameWeight || 2;
-        this.frameOpacity = options.frameOpacity || 0.8;
+        // 边框配置
+        this.frameEnabled = options.frameEnabled !== false;
         this.frameDraggable = options.frameDraggable !== false;
         this.frameResizable = options.frameResizable !== false;
 
-        // 格网线和标注
+        // 加载保存的边框位置和大小，如果没有则使用默认值
+        const savedFrameRect = this._loadFrameRect();
+        this.frameRect = savedFrameRect || options.frameRect || {
+            left: 100,
+            top: 100,
+            width: 400,
+            height: 300
+        };
+
+        // 状态
+        this.enabled = options.enabled !== false;
         this.lines = [];
         this.labels = [];
-        this.frame = null; // 矩形边框（HTML元素）
+        this.frame = null;
 
         // 拖动和调整大小管理器
         this.frameDraggableManager = null;
         this.frameResizableManager = null;
-
-        // 是否启用
-        this.enabled = options.enabled !== false;
-
-        // 使用常量配置（如果可用）
-        const defaults = L.GISElements.Constants ? L.GISElements.Constants.GRATICULE_DEFAULTS : {};
-
-        // 边框位置和大小（相对于地图容器的像素坐标）
-        this.frameRect = options.frameRect || {
-            left: defaults.FRAME_LEFT || 100,
-            top: defaults.FRAME_TOP || 100,
-            width: defaults.FRAME_WIDTH || 400,
-            height: defaults.FRAME_HEIGHT || 300
-        };
-
-        // 地图引用
-        this.map = null;
     }
 
     /**
-     * 添加到地图
+     * 获取容器CSS类名
      */
-    addTo(map) {
-        this.map = map;
+    getContainerClass() {
+        return 'leaflet-control-graticule';
+    }
 
-        // 监听地图事件（仅用于更新格网线和标签）
+    /**
+     * 获取默认样式集合
+     */
+    getDefaultStyles() {
+        return L.GISElements.StyleRegistry.getStyles('graticule');
+    }
+
+    /**
+     * 获取默认样式名称
+     */
+    getDefaultStyleName() {
+        return 'simple';
+    }
+
+    /**
+     * 样式初始化
+     */
+    onStyleInit(map, container) {
+        // 监听地图事件
         this._updateHandler = () => this.updateGraticule();
         map.on('move', this._updateHandler);
         map.on('zoom', this._updateHandler);
@@ -83,108 +94,89 @@ class GraticuleControl {
         if (this.enabled) {
             this.updateGraticule();
         }
-
-        return this;
     }
 
     /**
-     * 从地图移除
+     * 渲染格网（实现基类要求的方法）
      */
-    remove() {
-        if (this._updateHandler && this.map) {
-            this.map.off('move', this._updateHandler);
-            this.map.off('zoom', this._updateHandler);
-            this._updateHandler = null;
-        }
-
-        // 清理所有格网元素和事件监听器
-        this.clearGraticule();
-
-        this.map = null;
-        return this;
+    render() {
+        this.updateGraticule();
     }
 
     /**
      * 更新格网
-     * @param {boolean} updateFrame - 是否更新边框，默认true
      */
-    updateGraticule(updateFrame = true) {
+    updateGraticule() {
         if (!this.map) return;
 
-        // 只清除格网线和标签，保留边框和管理器
+        // 清除旧格网和边框
         this._clearLinesAndLabels();
+        this._clearFrame();
 
         // 只有启用时才绘制
         if (this.enabled) {
-            // 绘制边框（只在需要更新边框时）
-            if (this.frameEnabled && updateFrame) {
-                this._clearFrame();
-                this._drawFrame();
-            } else if (!this.frameEnabled && this.frame) {
-                // 如果禁用边框但边框仍存在，清除它
-                this._clearFrame();
-            } else if (this.frameEnabled && !this.frame) {
-                // 如果启用边框但边框不存在，创建它
-                this._drawFrame();
-            } else if (this.frame) {
-                // 边框已存在且不需要重建，只更新位置和大小
-                this.frame.style.left = this.frameRect.left + 'px';
-                this.frame.style.top = this.frameRect.top + 'px';
-                this.frame.style.width = this.frameRect.width + 'px';
-                this.frame.style.height = this.frameRect.height + 'px';
-
-                // 更新调整大小控制点位置
-                if (this.frameResizableManager) {
-                    this.frameResizableManager.updateHandlePositions();
-                }
-            }
-
-            // 绘制格网线和标签
-            const zoom = this.map.getZoom();
-            const lngInterval = this.lngInterval || this._calculateInterval(zoom);
-            const latInterval = this.latInterval || this._calculateInterval(zoom);
-
-            // 经线样式
-            const meridianOptions = {
-                color: this.meridianColor,
-                weight: this.meridianWeight,
-                opacity: this.meridianOpacity
-            };
-            if (this.meridianDashArray) {
-                meridianOptions.dashArray = this.meridianDashArray;
-            }
-
-            // 纬线样式
-            const parallelOptions = {
-                color: this.parallelColor,
-                weight: this.parallelWeight,
-                opacity: this.parallelOpacity
-            };
-            if (this.parallelDashArray) {
-                parallelOptions.dashArray = this.parallelDashArray;
-            }
-
-            // 使用边框对应的地理范围作为绘制区域
-            const bounds = this._getFrameLatLngBounds();
-
-            this._drawMeridians(bounds, lngInterval, meridianOptions);
-            this._drawParallels(bounds, latInterval, parallelOptions);
-        } else {
-            // 如果禁用，清除边框
-            if (this.frame) {
-                this._clearFrame();
-            }
+            this._drawGraticule();
         }
     }
 
     /**
+     * 绘制格网（使用当前样式）
+     * @private
+     */
+    _drawGraticule() {
+        const style = this.getCurrentStyleObject();
+        if (!style) return;
+
+        // 计算间隔
+        const zoom = this.map.getZoom();
+        const lngInterval = this.lngInterval || this._calculateInterval(zoom);
+        const latInterval = this.latInterval || this._calculateInterval(zoom);
+
+        // 获取边框对应的地理范围
+        const bounds = this._getFrameLatLngBounds();
+
+        // 绘制经线（使用样式）
+        this._drawMeridians(bounds, lngInterval, style.meridian);
+
+        // 绘制纬线（使用样式）
+        this._drawParallels(bounds, latInterval, style.parallel);
+
+        // 绘制边框
+        if (this.frameEnabled) {
+            this._drawFrame(style.frame);
+        }
+    }
+
+    /**
+     * 只重绘格网线和标签（不重新创建边框）
+     * @private
+     */
+    _redrawLinesOnly() {
+        const style = this.getCurrentStyleObject();
+        if (!style) return;
+
+        // 计算间隔
+        const zoom = this.map.getZoom();
+        const lngInterval = this.lngInterval || this._calculateInterval(zoom);
+        const latInterval = this.latInterval || this._calculateInterval(zoom);
+
+        // 获取边框对应的地理范围
+        const bounds = this._getFrameLatLngBounds();
+
+        // 绘制经线（使用样式）
+        this._drawMeridians(bounds, lngInterval, style.meridian);
+
+        // 绘制纬线（使用样式）
+        this._drawParallels(bounds, latInterval, style.parallel);
+    }
+
+    /**
      * 获取边框对应的地理坐标范围
+     * @private
      */
     _getFrameLatLngBounds() {
         if (!this.map) return this.map.getBounds();
 
-        // 将像素坐标转换为地理坐标
-        const container = this.map.getContainer();
         const topLeft = this.map.containerPointToLatLng([this.frameRect.left, this.frameRect.top]);
         const bottomRight = this.map.containerPointToLatLng([
             this.frameRect.left + this.frameRect.width,
@@ -195,137 +187,10 @@ class GraticuleControl {
     }
 
     /**
-     * 绘制边框（内层边框 - 格网边框）
-     * 这是被刻度标签包围的边框，用于格网线的显示范围
-     */
-    _drawFrame() {
-        // 使用常量获取 Z-Index（如果可用）
-        const zIndex = L.GISElements.Constants ? L.GISElements.Constants.Z_INDEX.GRATICULE_FRAME : 400;
-
-        // 创建HTML边框元素（内层 - 格网边框）
-        this.frame = document.createElement('div');
-        this.frame.className = 'graticule-frame';
-        this.frame.style.position = 'absolute';
-        this.frame.style.left = this.frameRect.left + 'px';
-        this.frame.style.top = this.frameRect.top + 'px';
-        this.frame.style.width = this.frameRect.width + 'px';
-        this.frame.style.height = this.frameRect.height + 'px';
-        this.frame.style.border = `${this.frameWeight}px solid ${this.frameColor}`;
-        this.frame.style.opacity = this.frameOpacity;
-        this.frame.style.boxSizing = 'border-box';
-        this.frame.style.pointerEvents = 'auto';
-        this.frame.style.zIndex = zIndex.toString();
-
-        // 添加到地图容器
-        this.map.getContainer().appendChild(this.frame);
-
-        // 使用 DraggableManager 添加拖动功能
-        if (this.frameDraggable && L.GISElements.Draggable) {
-            // 保存拖动开始时的位置
-            let dragStartRect = null;
-
-            this.frameDraggableManager = new L.GISElements.Draggable(this.frame, {
-                threshold: L.GISElements.Constants ? L.GISElements.Constants.DRAG_THRESHOLD : 5,
-                onDragStart: (e) => {
-                    // 记录拖动开始时的边框位置
-                    dragStartRect = { ...this.frameRect };
-
-                    // 禁用地图拖动
-                    if (this.map.dragging) {
-                        this.map.dragging.disable();
-                    }
-                    // 添加视觉反馈
-                    this.frame.style.cursor = 'grabbing';
-                    this.frame.style.opacity = '0.6';
-                    e.stopPropagation();
-                    e.preventDefault();
-                },
-                onDragging: (delta) => {
-                    // 使用拖动开始时的位置加上累计偏移量
-                    this.frameRect.left = dragStartRect.left + delta.x;
-                    this.frameRect.top = dragStartRect.top + delta.y;
-
-                    this.frame.style.left = this.frameRect.left + 'px';
-                    this.frame.style.top = this.frameRect.top + 'px';
-
-                    // 更新调整大小控制点位置
-                    if (this.frameResizableManager) {
-                        this.frameResizableManager.updateHandlePositions();
-                    }
-
-                    // 重新绘制格网（但不重建边框）
-                    this.updateGraticule(false);
-                },
-                onDragEnd: () => {
-                    // 恢复视觉反馈
-                    this.frame.style.cursor = 'move';
-                    this.frame.style.opacity = this.frameOpacity;
-
-                    // 重新启用地图拖动
-                    if (this.map.dragging) {
-                        this.map.dragging.enable();
-                    }
-                }
-            });
-            this.frameDraggableManager.enable();
-            this.frame.style.cursor = 'move';
-        }
-
-        // 使用 ResizableManager 添加调整大小功能
-        if (this.frameResizable && L.GISElements.Resizable) {
-            const minSize = L.GISElements.Constants ? L.GISElements.Constants.MIN_FRAME_WIDTH : 100;
-            const handleColor = this.frameColor;
-
-            this.frameResizableManager = new L.GISElements.Resizable(this.frame, {
-                minWidth: minSize,
-                minHeight: minSize,
-                handleColor: handleColor,
-                onResizeStart: () => {
-                    // 添加调整大小视觉反馈
-                    this.frame.style.opacity = '0.6';
-
-                    // 禁用地图拖动
-                    if (this.map.dragging) {
-                        this.map.dragging.disable();
-                    }
-                },
-                onResizing: () => {
-                    // 从元素样式更新 frameRect
-                    this.frameRect.left = parseInt(this.frame.style.left) || 0;
-                    this.frameRect.top = parseInt(this.frame.style.top) || 0;
-                    this.frameRect.width = parseInt(this.frame.style.width) || this.frame.offsetWidth;
-                    this.frameRect.height = parseInt(this.frame.style.height) || this.frame.offsetHeight;
-
-                    // 重新绘制格网（但不重建边框）
-                    this.updateGraticule(false);
-                },
-                onResizeEnd: () => {
-                    // 恢复视觉反馈
-                    this.frame.style.opacity = this.frameOpacity;
-
-                    // 重新启用地图拖动
-                    if (this.map.dragging) {
-                        this.map.dragging.enable();
-                    }
-                },
-                getBounds: () => this.frameRect,
-                setBounds: (bounds) => {
-                    this.frameRect = bounds;
-                    this.frame.style.left = bounds.left + 'px';
-                    this.frame.style.top = bounds.top + 'px';
-                    this.frame.style.width = bounds.width + 'px';
-                    this.frame.style.height = bounds.height + 'px';
-                }
-            });
-            this.frameResizableManager.enable();
-        }
-    }
-
-
-    /**
      * 绘制经线
+     * @private
      */
-    _drawMeridians(bounds, interval, styleOptions) {
+    _drawMeridians(bounds, interval, style) {
         const south = bounds.getSouth();
         const north = bounds.getNorth();
         const west = bounds.getWest();
@@ -334,28 +199,33 @@ class GraticuleControl {
         const startLng = Math.ceil(west / interval) * interval;
 
         for (let lng = startLng; lng <= east; lng += interval) {
-            // 绘制经线（只在边框内）
+            // 添加统一的CSS类名，方便导出控制
+            const lineStyle = { ...style, className: 'lge-graticule-line' };
             const line = L.polyline([
                 [south, lng],
                 [north, lng]
-            ], styleOptions).addTo(this.map);
+            ], lineStyle).addTo(this.map);
 
             this.lines.push(line);
 
-            // 添加标注（在边框外）
+            // 添加标签
             if (this.showLabels) {
-                // 顶部标签
-                this._addLabel(lng, north, this._formatLng(lng), 'longitude', 'top');
-                // 底部标签
-                this._addLabel(lng, south, this._formatLng(lng), 'longitude', 'bottom');
+                const labelStyle = this.getCurrentStyleObject().label;
+                if (this.labelPositions.top) {
+                    this._addLabel(lng, north, this._formatLng(lng), 'longitude', 'top', labelStyle);
+                }
+                if (this.labelPositions.bottom) {
+                    this._addLabel(lng, south, this._formatLng(lng), 'longitude', 'bottom', labelStyle);
+                }
             }
         }
     }
 
     /**
      * 绘制纬线
+     * @private
      */
-    _drawParallels(bounds, interval, styleOptions) {
+    _drawParallels(bounds, interval, style) {
         const south = bounds.getSouth();
         const north = bounds.getNorth();
         const west = bounds.getWest();
@@ -366,32 +236,37 @@ class GraticuleControl {
         for (let lat = startLat; lat <= north; lat += interval) {
             if (lat < -90 || lat > 90) continue;
 
-            // 绘制纬线（只在边框内）
+            // 添加统一的CSS类名，方便导出控制
+            const lineStyle = { ...style, className: 'lge-graticule-line' };
             const line = L.polyline([
                 [lat, west],
                 [lat, east]
-            ], styleOptions).addTo(this.map);
+            ], lineStyle).addTo(this.map);
 
             this.lines.push(line);
 
-            // 添加标注（在边框外）
+            // 添加标签
             if (this.showLabels) {
-                // 左侧标签
-                this._addLabel(west, lat, this._formatLat(lat), 'latitude', 'left');
-                // 右侧标签
-                this._addLabel(east, lat, this._formatLat(lat), 'latitude', 'right');
+                const labelStyle = this.getCurrentStyleObject().label;
+                if (this.labelPositions.left) {
+                    this._addLabel(west, lat, this._formatLat(lat), 'latitude', 'left', labelStyle);
+                }
+                if (this.labelPositions.right) {
+                    this._addLabel(east, lat, this._formatLat(lat), 'latitude', 'right', labelStyle);
+                }
             }
         }
     }
 
     /**
-     * 添加标注
+     * 添加标签
+     * @private
      */
-    _addLabel(lng, lat, text, type, position) {
+    _addLabel(lng, lat, text, type, position, style) {
         const label = L.marker([lat, lng], {
             icon: L.divIcon({
-                className: `graticule-label graticule-label-${type} graticule-label-${position}`,
-                html: `<span style="font-size: ${this.labelFontSize}px; font-family: ${this.labelFontFamily};">${text}</span>`,
+                className: `lge-graticule-label lge-graticule-label-${type} lge-graticule-label-${position}`,
+                html: `<span style="font-size: ${style.fontSize}px; font-family: ${style.fontFamily}; color: ${style.color};">${text}</span>`,
                 iconSize: null
             }),
             interactive: false,
@@ -402,63 +277,174 @@ class GraticuleControl {
     }
 
     /**
+     * 绘制边框
+     * @private
+     */
+    _drawFrame(frameStyle) {
+        const zIndex = L.GISElements.Constants ?
+            L.GISElements.Constants.Z_INDEX.GRATICULE_FRAME : 400;
+
+        this.frame = document.createElement('div');
+        this.frame.className = 'lge-graticule-frame';
+        this.frame.style.cssText = `
+            position: absolute;
+            left: ${this.frameRect.left}px;
+            top: ${this.frameRect.top}px;
+            width: ${this.frameRect.width}px;
+            height: ${this.frameRect.height}px;
+            border: ${frameStyle.weight}px solid ${frameStyle.color};
+            opacity: ${frameStyle.opacity};
+            box-sizing: border-box;
+            pointer-events: auto;
+            z-index: ${zIndex};
+        `;
+
+        this.map.getContainer().appendChild(this.frame);
+
+        // 使边框可拖动
+        if (this.frameDraggable && L.GISElements.Draggable) {
+            this._makeFrameDraggable();
+        }
+
+        // 使边框可调整大小
+        if (this.frameResizable && L.GISElements.Resizable) {
+            this._makeFrameResizable(frameStyle.color);
+        }
+    }
+
+    /**
+     * 使边框可拖动
+     * @private
+     */
+    _makeFrameDraggable() {
+        let dragStartRect = null;
+
+        this.frameDraggableManager = new L.GISElements.Draggable(this.frame, {
+            threshold: 5,
+            onDragStart: (e) => {
+                dragStartRect = { ...this.frameRect };
+                if (this.map.dragging) this.map.dragging.disable();
+                this.frame.style.cursor = 'grabbing';
+                this.frame.style.opacity = '0.6';
+                e.stopPropagation();
+                e.preventDefault();
+            },
+            onDragging: (delta) => {
+                this.frameRect.left = dragStartRect.left + delta.x;
+                this.frameRect.top = dragStartRect.top + delta.y;
+                this.frame.style.left = this.frameRect.left + 'px';
+                this.frame.style.top = this.frameRect.top + 'px';
+
+                if (this.frameResizableManager) {
+                    this.frameResizableManager.updateHandlePositions();
+                }
+
+                // 重新绘制格网线和标签（不重新创建边框）
+                this._clearLinesAndLabels();
+                this._redrawLinesOnly();
+            },
+            onDragEnd: () => {
+                this.frame.style.cursor = 'move';
+                const frameStyle = this.getCurrentStyleObject().frame;
+                this.frame.style.opacity = frameStyle.opacity;
+                if (this.map.dragging) this.map.dragging.enable();
+
+                // 保存边框位置和大小
+                this._saveFrameRect();
+            }
+        });
+
+        this.frameDraggableManager.enable();
+        this.frame.style.cursor = 'move';
+    }
+
+    /**
+     * 使边框可调整大小
+     * @private
+     */
+    _makeFrameResizable(handleColor) {
+        const minSize = L.GISElements.Constants ?
+            L.GISElements.Constants.MIN_FRAME_WIDTH : 100;
+
+        this.frameResizableManager = new L.GISElements.Resizable(this.frame, {
+            minWidth: minSize,
+            minHeight: minSize,
+            handleColor: handleColor,
+            onResizeStart: () => {
+                this.frame.style.opacity = '0.6';
+                if (this.map.dragging) this.map.dragging.disable();
+            },
+            onResizing: () => {
+                this.frameRect.left = parseInt(this.frame.style.left) || 0;
+                this.frameRect.top = parseInt(this.frame.style.top) || 0;
+                this.frameRect.width = parseInt(this.frame.style.width) || this.frame.offsetWidth;
+                this.frameRect.height = parseInt(this.frame.style.height) || this.frame.offsetHeight;
+
+                // 重新绘制格网线和标签（不重新创建边框）
+                this._clearLinesAndLabels();
+                this._redrawLinesOnly();
+            },
+            onResizeEnd: () => {
+                const frameStyle = this.getCurrentStyleObject().frame;
+                this.frame.style.opacity = frameStyle.opacity;
+                if (this.map.dragging) this.map.dragging.enable();
+
+                // 保存边框位置和大小
+                this._saveFrameRect();
+            },
+            getBounds: () => this.frameRect,
+            setBounds: (bounds) => {
+                this.frameRect = bounds;
+                this.frame.style.left = bounds.left + 'px';
+                this.frame.style.top = bounds.top + 'px';
+                this.frame.style.width = bounds.width + 'px';
+                this.frame.style.height = bounds.height + 'px';
+            }
+        });
+
+        this.frameResizableManager.enable();
+    }
+
+    /**
      * 清除格网线和标签（不清除边框）
      * @private
      */
     _clearLinesAndLabels() {
-        // 移除所有线条
         this.lines.forEach(line => {
-            if (this.map) {
-                this.map.removeLayer(line);
-            }
+            if (this.map) this.map.removeLayer(line);
         });
         this.lines = [];
 
-        // 移除所有标注
         this.labels.forEach(label => {
-            if (this.map) {
-                this.map.removeLayer(label);
-            }
+            if (this.map) this.map.removeLayer(label);
         });
         this.labels = [];
     }
 
     /**
-     * 清除边框和管理器
+     * 清除边框
      * @private
      */
     _clearFrame() {
-        // 清理拖动管理器
         if (this.frameDraggableManager) {
             this.frameDraggableManager.destroy();
             this.frameDraggableManager = null;
         }
 
-        // 清理调整大小管理器
         if (this.frameResizableManager) {
             this.frameResizableManager.destroy();
             this.frameResizableManager = null;
         }
 
-        // 移除边框
-        if (this.frame) {
-            if (this.frame.parentNode) {
-                this.frame.parentNode.removeChild(this.frame);
-            }
-            this.frame = null;
+        if (this.frame && this.frame.parentNode) {
+            this.frame.parentNode.removeChild(this.frame);
         }
-    }
-
-    /**
-     * 清除格网（包括线条、标签和边框）
-     */
-    clearGraticule() {
-        this._clearLinesAndLabels();
-        this._clearFrame();
+        this.frame = null;
     }
 
     /**
      * 计算合适的间隔
+     * @private
      */
     _calculateInterval(zoom) {
         if (zoom >= 17) return 0.001;
@@ -474,6 +460,7 @@ class GraticuleControl {
 
     /**
      * 格式化经度
+     * @private
      */
     _formatLng(lng) {
         const abs = Math.abs(lng);
@@ -483,6 +470,7 @@ class GraticuleControl {
 
     /**
      * 格式化纬度
+     * @private
      */
     _formatLat(lat) {
         const abs = Math.abs(lat);
@@ -490,58 +478,48 @@ class GraticuleControl {
         return `${abs.toFixed(3)}°${dir}`;
     }
 
-
     /**
-     * 设置间隔
+     * 加载保存的边框位置和大小
+     * @private
      */
-    setInterval(interval) {
-        this.interval = interval;
-        this.lngInterval = interval;
-        this.latInterval = interval;
-        this.updateGraticule();
+    _loadFrameRect() {
+        try {
+            const saved = localStorage.getItem('graticuleFrameRect');
+            if (!saved) return null;
+
+            const parsed = JSON.parse(saved);
+
+            // 验证数据格式
+            if (typeof parsed.left === 'number' &&
+                typeof parsed.top === 'number' &&
+                typeof parsed.width === 'number' &&
+                typeof parsed.height === 'number') {
+                return parsed;
+            }
+
+            return null;
+        } catch (e) {
+            console.warn('无法加载格网边框位置:', e);
+            return null;
+        }
     }
 
     /**
-     * 设置经度间隔
+     * 保存边框位置和大小
+     * @private
      */
-    setLngInterval(interval) {
-        this.lngInterval = interval;
-        this.updateGraticule();
+    _saveFrameRect() {
+        try {
+            localStorage.setItem('graticuleFrameRect', JSON.stringify(this.frameRect));
+        } catch (e) {
+            console.warn('无法保存格网边框位置:', e);
+        }
     }
 
-    /**
-     * 设置纬度间隔
-     */
-    setLatInterval(interval) {
-        this.latInterval = interval;
-        this.updateGraticule();
-    }
+    // ==================== 公共方法 ====================
 
     /**
-     * 同时设置经度和纬度间隔
-     */
-    setIntervals(lngInterval, latInterval) {
-        this.lngInterval = lngInterval;
-        this.latInterval = latInterval;
-        this.updateGraticule();
-    }
-
-    /**
-     * 获取当前经度间隔
-     */
-    getLngInterval() {
-        return this.lngInterval || this._calculateInterval(this.map ? this.map.getZoom() : 0);
-    }
-
-    /**
-     * 获取当前纬度间隔
-     */
-    getLatInterval() {
-        return this.latInterval || this._calculateInterval(this.map ? this.map.getZoom() : 0);
-    }
-
-    /**
-     * 启用格网线
+     * 启用格网
      */
     enable() {
         this.enabled = true;
@@ -549,15 +527,16 @@ class GraticuleControl {
     }
 
     /**
-     * 禁用格网线
+     * 禁用格网
      */
     disable() {
         this.enabled = false;
-        this.clearGraticule();
+        this._clearLinesAndLabels();
+        this._clearFrame();
     }
 
     /**
-     * 切换格网线显示状态
+     * 切换格网显示
      */
     toggle() {
         if (this.enabled) {
@@ -565,61 +544,6 @@ class GraticuleControl {
         } else {
             this.enable();
         }
-    }
-
-    /**
-     * 显示格网线
-     */
-    showGraticule() {
-        this.enable();
-    }
-
-    /**
-     * 隐藏格网线
-     */
-    hideGraticule() {
-        this.disable();
-    }
-
-    /**
-     * 设置边框矩形（像素坐标）
-     */
-    setFrameRect(rect) {
-        this.frameRect = rect;
-        this.updateGraticule();
-    }
-
-    /**
-     * 获取边框矩形（像素坐标）
-     */
-    getFrameRect() {
-        return this.frameRect;
-    }
-
-    /**
-     * 设置边框范围（兼容旧API，将地理坐标转换为像素坐标）
-     */
-    setFrameBounds(bounds) {
-        if (!this.map) return;
-
-        const topLeft = this.map.latLngToContainerPoint(bounds.getNorthWest());
-        const bottomRight = this.map.latLngToContainerPoint(bounds.getSouthEast());
-
-        this.frameRect = {
-            left: topLeft.x,
-            top: topLeft.y,
-            width: bottomRight.x - topLeft.x,
-            height: bottomRight.y - topLeft.y
-        };
-
-        this.updateGraticule();
-    }
-
-    /**
-     * 获取边框范围（兼容旧API，返回地理坐标）
-     */
-    getFrameBounds() {
-        return this._getFrameLatLngBounds();
     }
 
     /**
@@ -635,82 +559,119 @@ class GraticuleControl {
      */
     disableFrame() {
         this.frameEnabled = false;
+        this._clearFrame();
+    }
+
+    /**
+     * 设置间隔
+     */
+    setInterval(interval) {
+        this.interval = interval;
+        this.lngInterval = interval;
+        this.latInterval = interval;
         this.updateGraticule();
     }
 
     /**
-     * 设置经线样式
+     * 设置经纬度间隔
      */
-    setMeridianStyle(options = {}) {
-        if (options.color !== undefined) this.meridianColor = options.color;
-        if (options.weight !== undefined) this.meridianWeight = options.weight;
-        if (options.opacity !== undefined) this.meridianOpacity = options.opacity;
-        if (options.dashArray !== undefined) this.meridianDashArray = options.dashArray;
+    setIntervals(lngInterval, latInterval) {
+        this.lngInterval = lngInterval;
+        this.latInterval = latInterval;
         this.updateGraticule();
     }
 
     /**
-     * 设置纬线样式
+     * 获取经度间隔
      */
-    setParallelStyle(options = {}) {
-        if (options.color !== undefined) this.parallelColor = options.color;
-        if (options.weight !== undefined) this.parallelWeight = options.weight;
-        if (options.opacity !== undefined) this.parallelOpacity = options.opacity;
-        if (options.dashArray !== undefined) this.parallelDashArray = options.dashArray;
+    getLngInterval() {
+        return this.lngInterval || this._calculateInterval(this.map ? this.map.getZoom() : 0);
+    }
+
+    /**
+     * 获取纬度间隔
+     */
+    getLatInterval() {
+        return this.latInterval || this._calculateInterval(this.map ? this.map.getZoom() : 0);
+    }
+
+    /**
+     * 设置边框矩形
+     */
+    setFrameRect(rect) {
+        this.frameRect = rect;
+        this._saveFrameRect();
         this.updateGraticule();
     }
 
     /**
-     * 设置标签样式
+     * 获取边框矩形
      */
-    setLabelStyle(options = {}) {
-        if (options.fontSize !== undefined) this.labelFontSize = options.fontSize;
-        if (options.fontFamily !== undefined) this.labelFontFamily = options.fontFamily;
-        this.updateGraticule();
+    getFrameRect() {
+        return this.frameRect;
     }
 
     /**
-     * 获取经线样式
+     * 设置标签位置配置
+     * @param {Object} positions - 标签位置配置对象 { top, bottom, left, right }
      */
-    getMeridianStyle() {
-        return {
-            color: this.meridianColor,
-            weight: this.meridianWeight,
-            opacity: this.meridianOpacity,
-            dashArray: this.meridianDashArray
+    setLabelPositions(positions) {
+        this.labelPositions = { ...this.labelPositions, ...positions };
+        if (this.enabled) {
+            this.updateGraticule();
+        }
+        return this;
+    }
+
+    /**
+     * 获取标签位置配置
+     */
+    getLabelPositions() {
+        return { ...this.labelPositions };
+    }
+
+    /**
+     * 重置边框位置和大小到默认值
+     */
+    resetFrameRect() {
+        this.frameRect = {
+            left: 100,
+            top: 100,
+            width: 400,
+            height: 300
         };
+
+        // 清除保存的位置
+        try {
+            localStorage.removeItem('graticuleFrameRect');
+        } catch (e) {
+            console.warn('无法清除保存的格网边框位置:', e);
+        }
+
+        // 重新绘制
+        this.updateGraticule();
     }
 
     /**
-     * 获取纬线样式
+     * 控件销毁
      */
-    getParallelStyle() {
-        return {
-            color: this.parallelColor,
-            weight: this.parallelWeight,
-            opacity: this.parallelOpacity,
-            dashArray: this.parallelDashArray
-        };
-    }
+    onDestroy() {
+        if (this._updateHandler && this.map) {
+            this.map.off('move', this._updateHandler);
+            this.map.off('zoom', this._updateHandler);
+        }
 
-    /**
-     * 获取标签样式
-     */
-    getLabelStyle() {
-        return {
-            fontSize: this.labelFontSize,
-            fontFamily: this.labelFontFamily
-        };
+        this._clearLinesAndLabels();
+        this._clearFrame();
     }
 }
-
-// 初始化 L.GISElements 命名空间
-L.GISElements = L.GISElements || {};
 
 // 导出到 L.Control 命名空间
 L.Control.Graticule = GraticuleControl;
 
 // 工厂方法
 L.control.graticule = function (options) {
-    return new L.Control.Graticule(options);
+    const control = new L.Control.Graticule(options);
+    return control.createControl();
 };
+

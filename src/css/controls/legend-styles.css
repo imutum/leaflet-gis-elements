@@ -1,0 +1,235 @@
+/**
+ * 图例控件主题样式
+ * 包含所有图例样式的定义
+ */
+
+/* GIS经典样式 */
+.lge-legend-gis-container {
+    background: var(--lge-bg-white);
+    border: 2px solid var(--lge-border-dark);
+    padding: var(--lge-spacing-md);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    font-family: var(--lge-font-family);
+    min-width: 150px;
+    /* max-width和max-height由外层容器控制，以便动态调整 */
+    width: 100%;
+    height: 100%;
+    max-width: inherit;
+    max-height: inherit;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.lge-legend-gis-container:focus-visible {
+    outline: var(--lge-focus-width) solid var(--lge-focus-color);
+    outline-offset: var(--lge-focus-offset);
+}
+
+.lge-legend-gis-title {
+    font-size: var(--lge-font-size-base);
+    font-weight: bold;
+    margin-bottom: var(--lge-spacing-md);
+    color: var(--lge-text-primary);
+}
+
+.lge-legend-gis-no-layer {
+    font-size: var(--lge-font-size-sm);
+    color: var(--lge-text-muted);
+}
+
+.lge-legend-gis-item {
+    background: var(--lge-bg-white);
+}
+
+.lge-legend-gis-layer-name {
+    font-size: var(--lge-font-size-sm);
+    font-weight: 600;
+    color: var(--lge-text-primary);
+    margin-bottom: var(--lge-spacing-sm);
+}
+
+.lge-legend-gis-gradient {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lge-spacing-sm);
+}
+
+.lge-legend-gis-colorbar {
+    height: 20px;
+    border: 1px solid #000;
+}
+
+.lge-legend-gis-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--lge-font-size-xs);
+    color: var(--lge-text-primary);
+}
+
+.lge-legend-gis-label {
+    flex: 1;
+    text-align: center;
+}
+
+.lge-legend-gis-unit {
+    font-size: var(--lge-font-size-xs);
+    color: var(--lge-text-primary);
+    font-style: italic;
+    text-align: center;
+    margin-top: 2px;
+}
+
+.lge-legend-gis-simple {
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+}
+
+.lge-legend-gis-symbol {
+    width: 40px;
+    height: 20px;
+    border-radius: 2px;
+}
+
+.lge-legend-gis-symbol-polygon {
+    width: 50px;
+    height: 15px;
+    border-radius: 2px;
+}
+
+.lge-legend-gis-symbol-line {
+    width: 50px;
+    height: 5px;
+    border-radius: 1px;
+}
+
+.lge-legend-gis-symbol-point {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+/* 现代样式 */
+.lge-legend-modern-container {
+    background: var(--lge-bg-white);
+    border-radius: var(--lge-radius-xl);
+    box-shadow: var(--lge-shadow-lg);
+    overflow: hidden;
+    min-width: 180px;
+    /* max-width由外层容器控制，以便动态调整 */
+    width: 100%;
+    max-width: inherit;
+    box-sizing: border-box;
+}
+
+.lge-legend-modern-header {
+    background: linear-gradient(135deg, var(--lge-primary-color) 0%, #764ba2 100%);
+    color: white;
+    padding: var(--lge-spacing-md) var(--lge-spacing-lg);
+    font-weight: 600;
+    font-size: var(--lge-font-size-md);
+}
+
+.lge-legend-modern-title {
+    font-family: var(--lge-font-family);
+}
+
+.lge-legend-modern-content {
+    /* max-height由外层容器控制，以便动态调整 */
+    max-height: inherit;
+    overflow-y: auto;
+    padding: var(--lge-spacing-md);
+    box-sizing: border-box;
+}
+
+.lge-legend-modern-empty {
+    text-align: center;
+    color: var(--lge-text-light);
+    font-size: var(--lge-font-size-base);
+    padding: 10px;
+}
+
+.lge-legend-modern-item {
+    margin-bottom: var(--lge-spacing-md);
+    padding: var(--lge-spacing-md);
+    border-radius: var(--lge-radius-lg);
+    background: var(--lge-bg-light);
+    border: 1px solid var(--lge-border-color);
+}
+
+.lge-legend-modern-item:last-child {
+    margin-bottom: 0;
+}
+
+.lge-legend-modern-layer-name {
+    font-weight: 600;
+    font-size: var(--lge-font-size-base);
+    color: var(--lge-text-primary);
+    margin-bottom: var(--lge-spacing-sm);
+}
+
+.lge-legend-modern-gradient {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lge-spacing-sm);
+}
+
+.lge-legend-modern-colorbar {
+    height: 20px;
+    border-radius: var(--lge-radius-md);
+    border: 1px solid var(--lge-border-color);
+}
+
+.lge-legend-modern-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--lge-font-size-sm);
+    color: var(--lge-text-secondary);
+}
+
+.lge-legend-modern-label {
+    flex: 1;
+    text-align: center;
+}
+
+.lge-legend-modern-unit {
+    font-size: var(--lge-font-size-sm);
+    color: var(--lge-text-muted);
+    font-style: italic;
+    text-align: center;
+}
+
+.lge-legend-modern-simple {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 35px;
+}
+
+.lge-legend-modern-symbol {
+    width: 50px;
+    height: 25px;
+    border-radius: var(--lge-radius-md);
+    box-shadow: var(--lge-shadow-sm);
+}
+
+.lge-legend-modern-symbol-polygon {
+    width: 60px;
+    height: 15px;
+    border-radius: var(--lge-radius-md);
+    box-shadow: var(--lge-shadow-sm);
+}
+
+.lge-legend-modern-symbol-line {
+    width: 60px;
+    height: 5px;
+    border-radius: 2px;
+    box-shadow: var(--lge-shadow-sm);
+}
+
+.lge-legend-modern-symbol-point {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    box-shadow: var(--lge-shadow-sm);
+}

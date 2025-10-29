@@ -113,17 +113,77 @@ class ScaleBarControl extends L.GISElements.StylableControl {
 
         const html = style.render(this.scaleData);
 
-        // 清空旧内容
-        const existingContent = this.container.querySelector('.scale-bar-content');
-        if (existingContent) {
-            existingContent.remove();
-        }
+        // 完全清空旧内容，确保旧样式的类名被完全移除
+        this.container.innerHTML = '';
 
         // 创建新内容
         const contentWrapper = document.createElement('div');
         contentWrapper.className = 'scale-bar-content';
         contentWrapper.innerHTML = html;
         this.container.appendChild(contentWrapper);
+    }
+
+    /**
+     * 设置最大宽度
+     */
+    setMaxWidth(maxWidth) {
+        this.maxWidth = maxWidth;
+        this.update();
+    }
+
+    /**
+     * 获取最大宽度
+     */
+    getMaxWidth() {
+        return this.maxWidth;
+    }
+
+    /**
+     * 设置是否显示公制单位
+     */
+    setMetric(metric) {
+        this.metric = metric;
+        this.update();
+    }
+
+    /**
+     * 设置是否显示英制单位
+     */
+    setImperial(imperial) {
+        this.imperial = imperial;
+        this.update();
+    }
+
+    /**
+     * 设置是否在地图空闲时更新
+     */
+    setUpdateWhenIdle(updateWhenIdle) {
+        if (this.updateWhenIdle !== updateWhenIdle) {
+            this.updateWhenIdle = updateWhenIdle;
+
+            // 重新绑定事件监听器
+            if (this._updateHandler && this.map) {
+                // 移除旧的事件监听器
+                const oldEvent = !updateWhenIdle ? 'moveend' : 'move';
+                this.map.off(oldEvent, this._updateHandler);
+
+                // 绑定新的事件监听器
+                const newEvent = updateWhenIdle ? 'moveend' : 'move';
+                this.map.on(newEvent, this._updateHandler);
+            }
+        }
+    }
+
+    /**
+     * 获取配置信息
+     */
+    getOptions() {
+        return {
+            maxWidth: this.maxWidth,
+            metric: this.metric,
+            imperial: this.imperial,
+            updateWhenIdle: this.updateWhenIdle
+        };
     }
 
     /**

@@ -1,13 +1,13 @@
 /**
- * GIS简约样式
- * ArcGIS风格的简约指北针
+ * GIS专业样式
+ * ArcGIS风格的专业指北针
  */
 
 (function () {
     'use strict';
 
     const NorthArrowGISStyle = {
-        name: 'GIS简约',
+        name: 'GIS专业',
         svg: (size = 80) => `
             <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 50 82">
                 <!-- 背景透明 -->

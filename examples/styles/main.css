@@ -1,0 +1,352 @@
+/**
+ * Demo 主样式文件
+ * 统一管理示例页面的所有样式
+ */
+
+/* ========== 1. CSS 变量 ========== */
+@import '../../src/css/base/variables.css';
+
+/* ========== 2. 基础重置 ========== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--lge-font-family);
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ========== 3. 地图容器 ========== */
+#map {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* ========== 4. 控制面板 ========== */
+.control-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--lge-bg-white);
+    border-radius: var(--lge-radius-xl);
+    box-shadow: var(--lge-shadow-lg);
+    padding: var(--lge-spacing-xl);
+    z-index: var(--lge-z-index-base);
+    min-width: 280px;
+    max-width: 350px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.control-panel.panel-hidden {
+    transform: translateX(calc(100% + 20px));
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 控制面板滚动条 */
+.control-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.control-panel::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.control-panel::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.control-panel::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* 标题样式 */
+.control-panel h2 {
+    font-size: var(--lge-font-size-lg);
+    margin-bottom: var(--lge-spacing-lg);
+    color: var(--lge-text-primary);
+    border-bottom: 2px solid var(--lge-primary-color);
+    padding-bottom: var(--lge-spacing-sm);
+}
+
+.control-panel h3 {
+    font-size: var(--lge-font-size-md);
+    margin: 0 0 var(--lge-spacing-lg) 0;
+    color: var(--lge-text-secondary);
+}
+
+/* ========== 5. 面板切换按钮 ========== */
+.toggle-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    cursor: pointer;
+    font-size: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+}
+
+.toggle-panel:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-panel:active {
+    transform: scale(0.95);
+}
+
+/* ========== 6. 控制区域 ========== */
+.control-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.control-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.control-section h4 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #555;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* ========== 7. 控制组 ========== */
+.control-group {
+    margin-bottom: 12px;
+}
+
+.control-group:last-child {
+    margin-bottom: 0;
+}
+
+.control-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #666;
+    cursor: pointer;
+    user-select: none;
+}
+
+.control-group label:hover {
+    color: #333;
+}
+
+/* ========== 8. 表单控件 ========== */
+
+/* 复选框 */
+.control-group input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+/* 文本输入框 */
+.control-group input[type="text"],
+.control-group input[type="date"],
+.control-group input[type="number"],
+.control-group textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    background-color: white;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-family: inherit;
+}
+
+.control-group input[type="text"]:focus,
+.control-group input[type="date"]:focus,
+.control-group input[type="number"]:focus,
+.control-group textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+}
+
+.control-group input[type="text"]:hover,
+.control-group input[type="date"]:hover,
+.control-group input[type="number"]:hover,
+.control-group textarea:hover {
+    border-color: #999;
+}
+
+.control-group textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* 下拉选择框 */
+.control-group select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.control-group select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+}
+
+.control-group select:hover {
+    border-color: #999;
+}
+
+/* 按钮 */
+.control-group button,
+button {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.1s;
+    user-select: none;
+}
+
+.control-group button:hover,
+button:hover {
+    background-color: #45a049;
+}
+
+.control-group button:active,
+button:active {
+    background-color: #3d8b40;
+    transform: scale(0.98);
+}
+
+.control-group button:disabled,
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ========== 9. 信息文本 ========== */
+.info-text {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.6;
+}
+
+.info-text strong {
+    color: #555;
+    display: block;
+    margin-top: 8px;
+}
+
+.info-text strong:first-child {
+    margin-top: 0;
+}
+
+/* ========== 10. Details/Summary 样式 ========== */
+details {
+    margin: 8px 0;
+}
+
+summary {
+    cursor: pointer;
+    padding: 6px 0;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+summary:hover {
+    color: #4CAF50;
+}
+
+summary::marker {
+    color: #666;
+}
+
+/* ========== 11. 响应式设计 ========== */
+@media (max-width: 768px) {
+    .control-panel {
+        min-width: 240px;
+        max-width: 280px;
+        top: 5px;
+        right: 5px;
+        padding: var(--lge-spacing-md);
+        max-height: calc(100vh - 20px);
+    }
+
+    .toggle-panel {
+        top: 5px;
+        right: 5px;
+        padding: 8px;
+        font-size: 18px;
+    }
+
+    .control-section h4 {
+        font-size: 13px;
+    }
+
+    .control-group label {
+        font-size: 12px;
+    }
+
+    .control-group input,
+    .control-group select,
+    .control-group textarea,
+    .control-group button {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .control-panel {
+        min-width: 200px;
+        max-width: calc(100vw - 20px);
+    }
+}
+
+/* ========== 12. 打印样式 ========== */
+@media print {
+
+    .control-panel,
+    .toggle-panel {
+        display: none !important;
+    }
+
+    #map {
+        width: 100%;
+        height: 100vh;
+    }
+}

@@ -5,63 +5,80 @@
 
 :root {
     /* 主色调 */
-    --primary-color: #667eea;
-    --primary-hover: #5568d3;
-    --primary-light: rgba(102, 126, 234, 0.1);
-    
-    /* 次要颜色 */
-    --secondary-color: #6c757d;
-    --secondary-hover: #5a6268;
-    
-    /* 文本颜色 */
-    --text-primary: #333;
-    --text-secondary: #555;
-    --text-muted: #666;
-    --text-light: #999;
-    
-    /* 背景颜色 */
-    --bg-white: #ffffff;
-    --bg-light: #f8f9fa;
-    --bg-lighter: #f1f1f1;
-    --bg-border: #e0e0e0;
-    
-    /* 边框颜色 */
-    --border-color: #ddd;
-    --border-dark: #333;
-    
-    /* 阴影 */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.15);
-    --shadow-lg: 0 2px 12px rgba(0, 0, 0, 0.15);
-    
-    /* 圆角 */
-    --radius-sm: 3px;
-    --radius-md: 4px;
-    --radius-lg: 6px;
-    --radius-xl: 8px;
-    
-    /* 间距 */
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 12px;
-    --spacing-lg: 15px;
-    --spacing-xl: 20px;
-    
-    /* 字体 */
-    --font-family: Arial, 'Microsoft YaHei', sans-serif;
-    --font-size-xs: 10px;
-    --font-size-sm: 11px;
-    --font-size-base: 13px;
-    --font-size-md: 14px;
-    --font-size-lg: 18px;
-    
-    /* 过渡 */
-    --transition-fast: 0.15s ease;
-    --transition-base: 0.3s ease;
-    --transition-slow: 0.5s ease;
-    
-    /* Z-index */
-    --z-index-base: 1000;
-    --z-index-notification: 10000;
-}
+    --lge-primary-color: #667eea;
+    --lge-primary-hover: #5568d3;
+    --lge-primary-light: rgba(102, 126, 234, 0.1);
 
+    /* 次要颜色 */
+    --lge-secondary-color: #6c757d;
+    --lge-secondary-hover: #5a6268;
+
+    /* 语义化颜色 */
+    --lge-success-color: #4CAF50;
+    --lge-success-hover: #45a049;
+    --lge-info-color: #4A90E2;
+    --lge-info-hover: #3a7bc8;
+    --lge-warning-color: #ff9800;
+    --lge-danger-color: #f44336;
+
+    /* 文本颜色 */
+    --lge-text-primary: #333;
+    --lge-text-secondary: #555;
+    --lge-text-muted: #666;
+    --lge-text-light: #999;
+
+    /* 背景颜色 */
+    --lge-bg-white: #ffffff;
+    --lge-bg-light: #f8f9fa;
+    --lge-bg-lighter: #f1f1f1;
+    --lge-bg-border: #e0e0e0;
+
+    /* 边框颜色 */
+    --lge-border-color: #ddd;
+    --lge-border-dark: #333;
+
+    /* 阴影 */
+    --lge-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --lge-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --lge-shadow-lg: 0 2px 12px rgba(0, 0, 0, 0.15);
+
+    /* 圆角 */
+    --lge-radius-sm: 3px;
+    --lge-radius-md: 4px;
+    --lge-radius-lg: 6px;
+    --lge-radius-xl: 8px;
+
+    /* 间距 */
+    --lge-spacing-xs: 4px;
+    --lge-spacing-sm: 8px;
+    --lge-spacing-md: 12px;
+    --lge-spacing-lg: 15px;
+    --lge-spacing-xl: 20px;
+
+    /* 字体 */
+    --lge-font-family: Arial, 'Microsoft YaHei', sans-serif;
+    --lge-font-size-xs: 10px;
+    --lge-font-size-sm: 11px;
+    --lge-font-size-base: 13px;
+    --lge-font-size-md: 14px;
+    --lge-font-size-lg: 18px;
+
+    /* 过渡 */
+    --lge-transition-fast: 0.15s ease;
+    --lge-transition-base: 0.3s ease;
+    --lge-transition-slow: 0.5s ease;
+
+    /* Z-index */
+    --lge-z-index-base: 1000;
+    --lge-z-index-notification: 10000;
+
+    /* 焦点样式 */
+    --lge-focus-color: var(--lge-primary-color);
+    --lge-focus-width: 2px;
+    --lge-focus-offset: 2px;
+    --lge-focus-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+
+    /* 禁用状态 */
+    --lge-disabled-opacity: 0.5;
+    --lge-disabled-cursor: not-allowed;
+}

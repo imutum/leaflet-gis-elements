@@ -1,33 +1,69 @@
 /**
  * 动画定义
+ * 为控件提供可复用的动画效果
  */
 
-@keyframes slideIn {
+/* 淡入动画 */
+@keyframes lge-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* 淡出动画 */
+@keyframes lge-fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* 滑入动画 */
+@keyframes lge-slide-in {
     from {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
     }
 }
 
-@keyframes fadeIn {
+/* 缩放动画 */
+@keyframes lge-scale-in {
     from {
+        transform: scale(0.9);
         opacity: 0;
     }
+
     to {
+        transform: scale(1);
         opacity: 1;
     }
 }
 
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
+/* 动画工具类 */
+.lge-animate-fade-in {
+    animation: lge-fade-in var(--lge-transition-base);
 }
 
+.lge-animate-fade-out {
+    animation: lge-fade-out var(--lge-transition-base);
+}
+
+.lge-animate-slide-in {
+    animation: lge-slide-in var(--lge-transition-base);
+}
+
+.lge-animate-scale-in {
+    animation: lge-scale-in var(--lge-transition-base);
+}

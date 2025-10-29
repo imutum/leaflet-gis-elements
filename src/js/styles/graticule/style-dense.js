@@ -1,71 +1,47 @@
 /**
- * 密集样式
- * 更密集的经纬度格网样式，适合精确定位
+ * 格网密集样式
+ * 虚线网格，更加密集细腻
  */
 
 (function () {
+    'use strict';
+
     const GraticuleDenseStyle = {
         name: '密集样式',
 
-        /**
-         * 获取格网线样式
-         */
-        getLineStyle: (control) => {
-            return {
-                color: control.color || '#4A90E2',
-                weight: control.weight || 0.8,
-                opacity: control.opacity || 0.4,
-                dashArray: '2, 3',
-                interactive: false
-            };
+        // 经线样式
+        meridian: {
+            color: '#888',
+            weight: 0.5,
+            opacity: 0.3,
+            dashArray: '2, 2'  // 虚线
         },
 
-        /**
-         * 获取标注样式
-         */
-        getLabelStyle: (control) => {
-            return {
-                className: 'graticule-label-dense'
-            };
+        // 纬线样式
+        parallel: {
+            color: '#888',
+            weight: 0.5,
+            opacity: 0.3,
+            dashArray: '2, 2'  // 虚线
         },
 
-        /**
-         * 渲染控件面板
-         */
-        render: (control) => {
-            const lngInterval = control.getLngInterval();
-            const latInterval = control.getLatInterval();
+        // 边框样式
+        frame: {
+            color: '#444',
+            weight: 1,
+            opacity: 0.6
+        },
 
-            return `
-                <div class="graticule-dense-container">
-                    <div class="graticule-dense-header">
-                        <span class="graticule-dense-title">经纬度格网</span>
-                        <label class="graticule-dense-switch">
-                            <input type="checkbox" class="graticule-toggle" ${control.enabled ? 'checked' : ''}>
-                            <span class="graticule-dense-slider"></span>
-                        </label>
-                    </div>
-                    ${control.enabled ? `
-                        <div class="graticule-dense-info">
-                            <div class="graticule-interval-item" style="margin-bottom: 6px;">
-                                <span class="graticule-interval-label">边框窗格:</span>
-                                <label class="graticule-dense-switch" style="width: 36px; height: 18px;">
-                                    <input type="checkbox" class="graticule-frame-toggle" ${control.frameEnabled ? 'checked' : ''}>
-                                    <span class="graticule-dense-slider" style="border-radius: 18px;"></span>
-                                </label>
-                            </div>
-                            <div class="graticule-dense-interval">
-                                <span>经度: ${lngInterval}°</span>
-                                <span>纬度: ${latInterval}°</span>
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
+        // 标签样式
+        label: {
+            fontSize: 10,
+            fontFamily: 'Arial, sans-serif',
+            color: '#666'
         }
     };
 
-    // 自动注册样式
+    // 注册到 L.GISElements.StyleRegistry
     L.GISElements.StyleRegistry.register('graticule', 'dense', GraticuleDenseStyle);
+
 })();
 

@@ -33,7 +33,10 @@ class BaseMapControl {
         const self = this;
 
         const Control = L.Control.extend({
-            options: { position: self.position },
+            options: {
+                position: self.position,
+                control: self  // 保存控制类实例的引用
+            },
 
             onAdd: function (map) {
                 self.map = map;
@@ -61,6 +64,37 @@ class BaseMapControl {
 
             onRemove: function (map) {
                 self._cleanup();
+            },
+
+            // 代理常用方法到控制类实例
+            setStyle: function (style) {
+                if (typeof self.setStyle === 'function') {
+                    return self.setStyle(style);
+                }
+            },
+
+            setMaxWidth: function (width) {
+                if (typeof self.setMaxWidth === 'function') {
+                    return self.setMaxWidth(width);
+                }
+            },
+
+            setMaxHeight: function (height) {
+                if (typeof self.setMaxHeight === 'function') {
+                    return self.setMaxHeight(height);
+                }
+            },
+
+            setSize: function (size) {
+                if (typeof self.setSize === 'function') {
+                    return self.setSize(size);
+                }
+            },
+
+            resetPosition: function () {
+                if (typeof self.resetPosition === 'function') {
+                    return self.resetPosition();
+                }
             }
         });
 

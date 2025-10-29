@@ -1,0 +1,138 @@
+/**
+ * CSS辅助工具类
+ * 提供常用的工具类，避免重复定义
+ */
+
+/* ========== 文本工具 ========== */
+.lge-text-center {
+    text-align: center;
+}
+
+.lge-text-left {
+    text-align: left;
+}
+
+.lge-text-right {
+    text-align: right;
+}
+
+.lge-text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ========== 间距工具 ========== */
+.lge-mt-xs {
+    margin-top: var(--lge-spacing-xs);
+}
+
+.lge-mt-sm {
+    margin-top: var(--lge-spacing-sm);
+}
+
+.lge-mt-md {
+    margin-top: var(--lge-spacing-md);
+}
+
+.lge-mt-lg {
+    margin-top: var(--lge-spacing-lg);
+}
+
+.lge-mb-xs {
+    margin-bottom: var(--lge-spacing-xs);
+}
+
+.lge-mb-sm {
+    margin-bottom: var(--lge-spacing-sm);
+}
+
+.lge-mb-md {
+    margin-bottom: var(--lge-spacing-md);
+}
+
+.lge-mb-lg {
+    margin-bottom: var(--lge-spacing-lg);
+}
+
+.lge-pt-xs {
+    padding-top: var(--lge-spacing-xs);
+}
+
+.lge-pt-sm {
+    padding-top: var(--lge-spacing-sm);
+}
+
+.lge-pt-md {
+    padding-top: var(--lge-spacing-md);
+}
+
+.lge-pt-lg {
+    padding-top: var(--lge-spacing-lg);
+}
+
+.lge-pb-xs {
+    padding-bottom: var(--lge-spacing-xs);
+}
+
+.lge-pb-sm {
+    padding-bottom: var(--lge-spacing-sm);
+}
+
+.lge-pb-md {
+    padding-bottom: var(--lge-spacing-md);
+}
+
+.lge-pb-lg {
+    padding-bottom: var(--lge-spacing-lg);
+}
+
+/* ========== 显示工具 ========== */
+.lge-hidden {
+    display: none !important;
+}
+
+.lge-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ========== Flexbox工具 ========== */
+.lge-flex {
+    display: flex;
+}
+
+.lge-flex-column {
+    flex-direction: column;
+}
+
+.lge-flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lge-flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ========== 焦点样式（可访问性） ========== */
+.lge-focusable:focus-visible {
+    outline: var(--lge-focus-width) solid var(--lge-focus-color);
+    outline-offset: var(--lge-focus-offset);
+    box-shadow: var(--lge-focus-shadow);
+}
+
+/* 移除浏览器默认焦点样式 */
+.lge-focusable:focus {
+    outline: none;
+}

@@ -15,19 +15,19 @@
             const mileLabel = miles >= 1 ? miles + ' mi' : (miles * 5280).toFixed(0) + ' ft';
 
             return `
-                <div class="scale-bar-double" style="width: ${width}px;">
-                    <div class="scale-row">
-                        <div class="scale-bar-label">${label}</div>
-                        <div class="scale-bar-line">
-                            <div class="scale-segment" style="width: 50%; background: #000;"></div>
-                            <div class="scale-segment" style="width: 50%; background: #fff; border: 1px solid #000; border-left: none;"></div>
+                <div class="lge-scale-bar-double" style="width: ${width}px;">
+                    <div class="lge-scale-row">
+                        <div class="lge-scale-bar-label">${label}</div>
+                        <div class="lge-scale-bar-line">
+                            <div class="lge-scale-segment" style="width: 50%; background: #000;"></div>
+                            <div class="lge-scale-segment" style="width: 50%; background: #fff; border: 1px solid #000; border-left: none;"></div>
                         </div>
                     </div>
-                    <div class="scale-row">
-                        <div class="scale-bar-label">${mileLabel}</div>
-                        <div class="scale-bar-line">
-                            <div class="scale-segment" style="width: 50%; background: #555;"></div>
-                            <div class="scale-segment" style="width: 50%; background: #ddd; border: 1px solid #555; border-left: none;"></div>
+                    <div class="lge-scale-row">
+                        <div class="lge-scale-bar-label">${mileLabel}</div>
+                        <div class="lge-scale-bar-line">
+                            <div class="lge-scale-segment" style="width: 50%; background: #555;"></div>
+                            <div class="lge-scale-segment" style="width: 50%; background: #ddd; border: 1px solid #555; border-left: none;"></div>
                         </div>
                     </div>
                 </div>

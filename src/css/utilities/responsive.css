@@ -1,33 +1,49 @@
 /**
  * 响应式设计
+ * 集中管理所有控件的响应式样式
  */
 
+/* 平板及以下 */
 @media (max-width: 768px) {
-    .control-panel {
-        top: 10px;
-        right: 10px;
-        left: 10px;
-        max-width: none;
-        min-width: auto;
-    }
 
+    /* 北箭头和比例尺 */
     .leaflet-control-north-arrow,
     .leaflet-control-scale-bar {
-        font-size: var(--font-size-sm);
-    }
-}
-
-@media (max-width: 480px) {
-    .control-panel {
-        padding: var(--spacing-lg);
+        font-size: var(--lge-font-size-sm);
     }
 
-    .control-panel h2 {
+    /* 格网标签 */
+    .lge-graticule-label span {
+        font-size: 9px;
+        padding: 1px var(--lge-spacing-xs);
+    }
+
+    /* 地图注记 */
+    .leaflet-control-map-info {
+        max-width: 250px;
+        font-size: 90%;
+    }
+
+    .lge-map-info-title {
         font-size: 16px;
     }
 
-    .control-group {
-        padding: var(--spacing-md);
+    .lge-map-info-subtitle {
+        font-size: 13px;
+    }
+
+    .lge-map-info-item {
+        font-size: 11px;
     }
 }
 
+/* 手机 */
+@media (max-width: 480px) {
+
+    /* 可以添加更小屏幕的样式调整 */
+    .leaflet-control-north-arrow,
+    .leaflet-control-scale-bar,
+    .leaflet-control-legend {
+        font-size: var(--lge-font-size-xs);
+    }
+}

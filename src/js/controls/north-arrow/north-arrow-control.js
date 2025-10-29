@@ -67,15 +67,17 @@ class NorthArrowControl extends L.GISElements.StylableControl {
             ? style.svg(this.size)
             : style.svg;
 
-        // 清空旧内容
-        const existingContent = this.container.querySelector('.north-arrow-content');
-        if (existingContent) {
-            existingContent.remove();
-        }
+        // 完全清空旧内容，确保旧样式的类名被完全移除
+        this.container.innerHTML = '';
+
+        // 重新应用容器尺寸样式，确保切换样式时不丢失
+        this.container.style.width = this.size + 'px';
+        this.container.style.height = this.size + 'px';
+        this.container.style.background = 'transparent';
 
         // 创建新内容
         const contentWrapper = document.createElement('div');
-        contentWrapper.className = 'north-arrow-content';
+        contentWrapper.className = 'lge-north-arrow-content';
         contentWrapper.title = style.name;
         contentWrapper.innerHTML = svgContent;
         this.container.appendChild(contentWrapper);
@@ -91,6 +93,22 @@ class NorthArrowControl extends L.GISElements.StylableControl {
             this.container.style.height = size + 'px';
             this.render();
         }
+    }
+
+    /**
+     * 获取大小
+     */
+    getSize() {
+        return this.size;
+    }
+
+    /**
+     * 获取配置信息
+     */
+    getOptions() {
+        return {
+            size: this.size
+        };
     }
 }
 

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet GIS Elements - 交互演示</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Demo 页面样式 -->
+    <link rel="stylesheet" href="./styles/main.css" />
+
+    <!-- LeafletGISElements CSS -->
+    <link rel="stylesheet" href="../dist/leaflet-gis-elements.min.css" />
+</head>
+
+<body>
+    <!-- 地图容器 -->
+    <div id="map"></div>
+
+    <!-- 面板切换按钮 -->
+    <div class="toggle-panel" onclick="togglePanel()" title="切换控制面板">⚙️</div>
+
+    <!-- 控制面板 -->
+    <div class="control-panel" id="controlPanel">
+        <h3>🎮 控制面板</h3>
+
+        <!-- 经纬度格网 -->
+        <div class="control-section">
+            <h4 style="cursor: pointer; user-select: none;" onclick="toggleSection('graticuleSection')">
+                📐 经纬度格网 <span id="graticuleToggle">▼</span>
+            </h4>
+            <div id="graticuleSection">
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="showGraticule" checked>
+                        <strong>显示格网</strong>
+                    </label>
+                    <small style="color: #666; font-size: 11px; display: block; margin-left: 20px;">
+                        格网边框可拖动调整，用于精确定义导出范围
+                    </small>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="showGraticuleLines" checked> 显示经纬线
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="showGraticuleFrame" checked> 显示边框
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label for="graticuleInterval">格网间隔：</label>
+                    <select id="graticuleInterval">
+                        <option value="auto" selected>自动</option>
+                        <option value="0.001">0.001° (约111m)</option>
+                        <option value="0.005">0.005° (约555m)</option>
+                        <option value="0.01">0.01° (约1.1km)</option>
+                        <option value="0.05">0.05° (约5.5km)</option>
+                        <option value="0.1">0.1° (约11km)</option>
+                        <option value="0.5">0.5° (约55km)</option>
+                        <option value="1">1° (约111km)</option>
+                        <option value="5">5° (约555km)</option>
+                    </select>
+                </div>
+
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; font-size: 12px; color: #666; font-weight: 600;">
+                        经纬线样式
+                    </summary>
+                    <div style="padding: 8px 0;">
+                        <div class="control-group">
+                            <label for="graticuleLineColor">线条颜色：</label>
+                            <div style="display: flex; gap: 5px; align-items: center;">
+                                <input type="color" id="graticuleLineColor" value="#666666"
+                                    style="width: 50px; height: 30px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                                <input type="text" id="graticuleLineColorText" value="#666666"
+                                    style="flex: 1; padding: 5px; font-size: 12px;" readonly>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label for="graticuleLineWeight">线条粗细：</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="range" id="graticuleLineWeight" value="1" min="0.5" max="5" step="0.5"
+                                    style="flex: 1;">
+                                <span id="graticuleLineWeightValue" style="min-width: 40px; font-size: 12px;">1px</span>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label for="graticuleLineOpacity">透明度：</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="range" id="graticuleLineOpacity" value="0.5" min="0" max="1" step="0.1"
+                                    style="flex: 1;">
+                                <span id="graticuleLineOpacityValue"
+                                    style="min-width: 40px; font-size: 12px;">0.5</span>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label for="graticuleLineStyle">线型：</label>
+                            <select id="graticuleLineStyle" style="font-size: 12px;">
+                                <option value="">实线</option>
+                                <option value="2, 2">虚线 - 短</option>
+                                <option value="5, 5">虚线 - 中</option>
+                                <option value="10, 5">虚线 - 长</option>
+                                <option value="5, 2, 2, 2">点划线</option>
+                            </select>
+                        </div>
+                    </div>
+                </details>
+
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; font-size: 12px; color: #666; font-weight: 600;">
+                        标注位置设置
+                    </summary>
+                    <div style="padding: 8px 0;">
+                        <label style="display: block; font-size: 12px; margin: 4px 0;">
+                            <input type="checkbox" id="labelTop" checked> 顶部（经度）
+                        </label>
+                        <label style="display: block; font-size: 12px; margin: 4px 0;">
+                            <input type="checkbox" id="labelBottom" checked> 底部（经度）
+                        </label>
+                        <label style="display: block; font-size: 12px; margin: 4px 0;">
+                            <input type="checkbox" id="labelLeft" checked> 左侧（纬度）
+                        </label>
+                        <label style="display: block; font-size: 12px; margin: 4px 0;">
+                            <input type="checkbox" id="labelRight" checked> 右侧（纬度）
+                        </label>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- 地图注记 -->
+        <div class="control-section">
+            <h4 style="cursor: pointer; user-select: none;" onclick="toggleSection('mapInfoSection')">
+                📝 地图注记 <span id="mapInfoToggle">▼</span>
+            </h4>
+            <div id="mapInfoSection">
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="showMapInfo" checked>
+                        <strong>显示注记</strong>
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label for="mapInfoStyle">注记样式：</label>
+                    <select id="mapInfoStyle"></select>
+                </div>
+
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; font-size: 12px; color: #666; font-weight: 600;">
+                        字段显示控制
+                    </summary>
+                    <div style="padding: 8px; background: #f5f5f5; border-radius: 4px; margin-top: 5px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                            <label style="font-size: 12px;">
+                                <input type="checkbox" id="showFieldTitle" checked> 标题
+                            </label>
+                            <label style="font-size: 12px;">
+                                <input type="checkbox" id="showFieldSubtitle" checked> 副标题
+                            </label>
+                            <label style="font-size: 12px;">
+                                <input type="checkbox" id="showFieldAuthor" checked> 制图者
+                            </label>
+                            <label style="font-size: 12px;">
+                                <input type="checkbox" id="showFieldOrganization" checked> 制图单位
+                            </label>
+                            <label style="font-size: 12px;">
+                                <input type="checkbox" id="showFieldDate" checked> 日期
+                            </label>
+                            <label style="font-size: 12px;">
+                                <input type="checkbox" id="showFieldDataSource" checked> 数据来源
+                            </label>
+                            <label style="font-size: 12px;">
+                                <input type="checkbox" id="showFieldProjection" checked> 坐标系统
+                            </label>
+                            <label style="font-size: 12px;">
+                                <input type="checkbox" id="showFieldScale" checked> 比例尺
+                            </label>
+                            <label style="font-size: 12px; grid-column: 1 / -1;">
+                                <input type="checkbox" id="showFieldNotes"> 备注说明
+                            </label>
+                        </div>
+                    </div>
+                </details>
+
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; font-size: 12px; color: #666; font-weight: 600;">
+                        填写注记信息
+                    </summary>
+                    <div style="padding-top: 8px;">
+                        <div class="control-group">
+                            <label for="mapTitle">标题：</label>
+                            <input type="text" id="mapTitle" placeholder="如：北京市温度分布专题图">
+                        </div>
+                        <div class="control-group">
+                            <label for="mapSubtitle">副标题：</label>
+                            <input type="text" id="mapSubtitle" placeholder="如：2025年10月气温数据">
+                        </div>
+                        <div class="control-group">
+                            <label for="mapAuthor">制图者：</label>
+                            <input type="text" id="mapAuthor" placeholder="如：张三">
+                        </div>
+                        <div class="control-group">
+                            <label for="mapOrganization">制图单位：</label>
+                            <input type="text" id="mapOrganization" placeholder="如：XX地理信息中心">
+                        </div>
+                        <div class="control-group">
+                            <label for="mapDate">制图日期：</label>
+                            <input type="date" id="mapDate">
+                        </div>
+                        <div class="control-group">
+                            <label for="mapDataSource">数据来源：</label>
+                            <input type="text" id="mapDataSource" placeholder="如：国家气象局">
+                        </div>
+                        <div class="control-group">
+                            <label for="mapProjection">坐标系统：</label>
+                            <input type="text" id="mapProjection" value="WGS84 / EPSG:4326">
+                        </div>
+                        <div class="control-group">
+                            <label for="mapScaleText">比例尺：</label>
+                            <input type="text" id="mapScaleText" placeholder="如：1:100000">
+                        </div>
+                        <div class="control-group">
+                            <label for="mapNotes">备注说明：</label>
+                            <textarea id="mapNotes" rows="2" placeholder="如：仅供参考，最终解释权归XX所有"></textarea>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- 指北针 -->
+        <div class="control-section">
+            <h4 style="cursor: pointer; user-select: none;" onclick="toggleSection('northArrowSection')">
+                🧭 指北针 <span id="northArrowToggle">▼</span>
+            </h4>
+            <div id="northArrowSection">
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="showNorthArrow" checked>
+                        <strong>显示指北针</strong>
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label for="northArrowStyle">样式：</label>
+                    <select id="northArrowStyle"></select>
+                </div>
+                <div class="control-group">
+                    <label for="northArrowSize">大小（px）：</label>
+                    <input type="number" id="northArrowSize" value="80" min="40" max="200" step="10">
+                </div>
+            </div>
+        </div>
+
+        <!-- 比例尺 -->
+        <div class="control-section">
+            <h4 style="cursor: pointer; user-select: none;" onclick="toggleSection('scaleBarSection')">
+                📏 比例尺 <span id="scaleBarToggle">▼</span>
+            </h4>
+            <div id="scaleBarSection">
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="showScaleBar" checked>
+                        <strong>显示比例尺</strong>
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label for="scaleBarStyle">样式：</label>
+                    <select id="scaleBarStyle"></select>
+                </div>
+                <div class="control-group">
+                    <label for="scaleBarWidth">宽度（px）：</label>
+                    <input type="number" id="scaleBarWidth" value="300" min="100" max="600" step="50">
+                </div>
+            </div>
+        </div>
+
+        <!-- 图例 -->
+        <div class="control-section">
+            <h4 style="cursor: pointer; user-select: none;" onclick="toggleSection('legendSection')">
+                🗺️ 图例 <span id="legendToggle">▼</span>
+            </h4>
+            <div id="legendSection">
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="showLegend" checked>
+                        <strong>显示图例</strong>
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label for="legendStyle">样式：</label>
+                    <select id="legendStyle"></select>
+                </div>
+                <div class="control-group">
+                    <label for="legendWidth">最大宽度（px）：</label>
+                    <input type="number" id="legendWidth" value="300" min="150" max="500" step="50">
+                    <small style="color: #666; font-size: 11px; display: block; margin-top: 2px;">
+                        实际大小根据内容自适应
+                    </small>
+                </div>
+                <div class="control-group">
+                    <label for="legendHeight">最大高度（px）：</label>
+                    <input type="number" id="legendHeight" value="400" min="200" max="800" step="50">
+                    <small style="color: #666; font-size: 11px; display: block; margin-top: 2px;">
+                        内容超出时出现滚动条
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 地图导出 -->
+        <div class="control-section"
+            style="background: #f8f9fa; border: 2px solid #2196F3; border-radius: 8px; padding: 12px;">
+            <h4 style="color: #333; margin-top: 0;">📥 地图导出</h4>
+
+            <div class="control-group" style="margin-bottom: 8px;">
+                <label for="exportFilename" style="color: #333; font-weight: 600;">文件名前缀：</label>
+                <input type="text" id="exportFilename" value="thematic_map" placeholder="输入文件名">
+                <small style="color: #666; font-size: 11px; display: block; margin-top: 2px;">
+                    💾 自动添加时间戳，避免文件覆盖
+                </small>
+            </div>
+
+            <div class="control-group" style="margin-bottom: 8px;">
+                <label for="exportRange" style="color: #333; font-weight: 600;">导出范围：</label>
+                <select id="exportRange" style="font-weight: 500;">
+                    <option value="graticule">🎯 经纬格网范围（推荐）</option>
+                    <option value="viewport">📺 当前视口范围</option>
+                    <option value="auto">🔍 自动识别（含所有要素）</option>
+                </select>
+            </div>
+
+            <details style="margin-bottom: 8px;">
+                <summary style="cursor: pointer; font-size: 12px; color: #333; font-weight: 600; margin-bottom: 5px;">
+                    导出内容选择
+                </summary>
+                <div
+                    style="padding: 8px; background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                        <label style="font-size: 12px; color: #333;">
+                            <input type="checkbox" id="exportIncludeBasemap" checked> 底图
+                        </label>
+                        <label style="font-size: 12px; color: #333;">
+                            <input type="checkbox" id="exportIncludeMapInfo" checked> 注记
+                        </label>
+                        <label style="font-size: 12px; color: #333;">
+                            <input type="checkbox" id="exportIncludeGraticule" checked> 格网
+                        </label>
+                        <label style="font-size: 12px; color: #333;">
+                            <input type="checkbox" id="exportIncludeLegend" checked> 图例
+                        </label>
+                        <label style="font-size: 12px; color: #333;">
+                            <input type="checkbox" id="exportIncludeScaleBar" checked> 比例尺
+                        </label>
+                        <label style="font-size: 12px; color: #333;">
+                            <input type="checkbox" id="exportIncludeNorthArrow" checked> 指北针
+                        </label>
+                    </div>
+                </div>
+            </details>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <div>
+                    <label for="exportFormat" style="color: #333; font-weight: 600; font-size: 12px;">格式：</label>
+                    <select id="exportFormat" style="font-size: 12px; padding: 5px; font-weight: 500;">
+                        <option value="png">PNG</option>
+                        <option value="jpg">JPG</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="exportScale" style="color: #333; font-weight: 600; font-size: 12px;">分辨率：</label>
+                    <select id="exportScale" style="font-size: 12px; padding: 5px; font-weight: 500;">
+                        <option value="1">1x</option>
+                        <option value="2" selected>2x ⭐</option>
+                        <option value="3">3x</option>
+                        <option value="4">4x</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="control-group" style="margin-bottom: 8px;">
+                <label for="exportQuality" style="color: #333; font-weight: 600;">质量：</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" id="exportQuality" value="1.0" min="0.1" max="1.0" step="0.1" style="flex: 1;"
+                        oninput="document.getElementById('qualityValue').textContent = this.value">
+                    <span id="qualityValue" style="min-width: 30px; font-weight: 600; color: #333;">1.0</span>
+                </div>
+                <div id="qualityRecommendation"
+                    style="font-size: 10px; margin-top: 5px; padding: 4px; border-radius: 3px; background: #e3f2fd; color: #333;">
+                    ⭐ 最高质量 - 适合印刷和正式出版
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;">
+                <button id="previewExportButton"
+                    style="background-color: #fff; color: #333; font-size: 12px; padding: 8px; font-weight: 600; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                    👁️ 预览
+                </button>
+                <button id="exportMapButton"
+                    style="background-color: #333; color: white; font-size: 12px; padding: 8px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer;">
+                    🖼️ 导出
+                </button>
+            </div>
+        </div>
+
+        <!-- 使用提示 -->
+        <details class="control-section" style="border-top: 1px solid #eee; padding-top: 10px;">
+            <summary style="cursor: pointer; font-size: 13px; color: #666; font-weight: 600;">
+                💡 使用提示
+            </summary>
+            <div class="info-text" style="margin-top: 10px; padding-top: 0; border-top: none;">
+                <strong>工作流程：</strong><br>
+                1️⃣ 调整格网定义导出范围<br>
+                2️⃣ 配置各元素样式和尺寸<br>
+                3️⃣ 填写地图注记信息<br>
+                4️⃣ 预览后导出<br><br>
+                <strong>技巧：</strong><br>
+                • 所有元素可拖动调整位置<br>
+                • 格网边框可调整大小<br>
+                • 经纬线可自定义颜色和线型<br><br>
+                <strong>质量推荐：</strong><br>
+                学术论文：3x/PNG/1.0<br>
+                网页展示：2x/JPG/0.8<br>
+                快速预览：1x/JPG/0.5
+            </div>
+        </details>
+    </div>
+
+    <!-- 依赖库 -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- LeafletGISElements JS -->
+    <script src="../dist/leaflet-gis-elements.min.js"></script>
+
+    <!-- Demo 应用脚本 -->
+    <script src="./js/config.js"></script>
+    <script src="./js/ui-controller.js"></script>
+    <script src="./js/demo.js"></script>
+</body>
+
+</html>

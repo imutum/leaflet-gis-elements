@@ -35,6 +35,12 @@ class StylableControl extends L.GISElements.BaseControl {
     setStyle(styleName) {
         if (this.styles[styleName]) {
             this.currentStyle = styleName;
+
+            // 重新应用样式初始化，确保容器样式正确
+            if (this.map && this.container) {
+                this.onStyleInit(this.map, this.container);
+            }
+
             this.render();
         } else {
             console.warn(`样式 "${styleName}" 不存在`);

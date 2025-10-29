@@ -66,15 +66,22 @@ class LegendControl extends L.GISElements.StylableControl {
 
         const html = style.renderContainer(this.layers);
 
-        // 清空旧内容
-        const existingContent = this.container.querySelector('.legend-content');
-        if (existingContent) {
-            existingContent.remove();
-        }
+        // 完全清空旧内容，确保旧样式的类名被完全移除
+        this.container.innerHTML = '';
+
+        // 重新应用容器尺寸样式，确保切换样式时不丢失
+        this.container.style.maxWidth = this.maxWidth + 'px';
+        this.container.style.maxHeight = this.maxHeight + 'px';
 
         // 创建新内容
         const contentWrapper = document.createElement('div');
         contentWrapper.className = 'legend-content';
+        // 确保包装元素不限制尺寸
+        contentWrapper.style.width = '100%';
+        contentWrapper.style.height = '100%';
+        contentWrapper.style.maxWidth = 'inherit';
+        contentWrapper.style.maxHeight = 'inherit';
+        contentWrapper.style.boxSizing = 'border-box';
         contentWrapper.innerHTML = html;
         this.container.appendChild(contentWrapper);
     }
@@ -116,6 +123,51 @@ class LegendControl extends L.GISElements.StylableControl {
      */
     update() {
         this.render();
+    }
+
+    /**
+     * 设置最大宽度
+     */
+    setMaxWidth(maxWidth) {
+        this.maxWidth = maxWidth;
+        if (this.container) {
+            this.container.style.maxWidth = maxWidth + 'px';
+        }
+    }
+
+    /**
+     * 设置最大高度
+     */
+    setMaxHeight(maxHeight) {
+        this.maxHeight = maxHeight;
+        if (this.container) {
+            this.container.style.maxHeight = maxHeight + 'px';
+        }
+    }
+
+    /**
+     * 获取最大宽度
+     */
+    getMaxWidth() {
+        return this.maxWidth;
+    }
+
+    /**
+     * 获取最大高度
+     */
+    getMaxHeight() {
+        return this.maxHeight;
+    }
+
+    /**
+     * 获取配置信息
+     */
+    getOptions() {
+        return {
+            maxWidth: this.maxWidth,
+            maxHeight: this.maxHeight,
+            layers: this.layers
+        };
     }
 }
 

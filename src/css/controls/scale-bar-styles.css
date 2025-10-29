@@ -1,0 +1,188 @@
+/**
+ * 比例尺控件主题样式
+ * 包含所有比例尺样式的定义
+ */
+
+/* Leaflet经典样式 */
+.lge-scale-bar-leaflet {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: var(--lge-shadow-sm);
+}
+
+.lge-scale-bar-leaflet .lge-scale-bar-label {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-sm);
+    font-weight: bold;
+    color: var(--lge-text-primary);
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+.lge-scale-bar-leaflet .lge-scale-bar-line {
+    display: flex;
+    height: 5px;
+    border: 2px solid #777;
+    border-top: none;
+}
+
+.lge-scale-bar-leaflet .lge-scale-segment {
+    height: 100%;
+}
+
+/* GIS经典样式 */
+.lge-scale-bar-gis-classic {
+    background: var(--lge-bg-white);
+    padding: 6px 8px;
+    border: 1px solid var(--lge-border-dark);
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.lge-scale-bar-gis-classic .lge-scale-bar-line-top,
+.lge-scale-bar-gis-classic .lge-scale-bar-line-bottom {
+    height: 2px;
+    background: #000;
+}
+
+.lge-scale-bar-gis-classic .lge-scale-bar-segments {
+    display: flex;
+    height: 10px;
+    margin: 1px 0;
+}
+
+.lge-scale-bar-gis-classic .lge-scale-segment-black {
+    width: 50%;
+    background: #000;
+}
+
+.lge-scale-bar-gis-classic .lge-scale-segment-white {
+    width: 50%;
+    background: #fff;
+    border: 1px solid #000;
+    border-left: none;
+}
+
+.lge-scale-bar-gis-classic .lge-scale-bar-label {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-sm);
+    font-weight: bold;
+    color: var(--lge-text-primary);
+    text-align: center;
+    margin-top: 3px;
+}
+
+/* GIS专业样式（棋盘格交替） */
+.lge-scale-bar-gis {
+    background: rgba(0, 0, 0, 0);
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0);
+    box-shadow: none;
+}
+
+.lge-scale-bar-gis .lge-scale-bar-ruler {
+    position: relative;
+    height: 20px;
+    border: 2px solid #000;
+}
+
+.lge-scale-bar-gis .lge-scale-segment {
+    position: absolute;
+    height: 50%;
+}
+
+.lge-scale-bar-gis .lge-scale-segment-black {
+    background: #000;
+}
+
+.lge-scale-bar-gis .lge-scale-segment-white {
+    background: #fff;
+}
+
+.lge-scale-bar-gis .lge-scale-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    position: relative;
+}
+
+.lge-scale-bar-gis .lge-scale-label {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-xs);
+    font-weight: bold;
+    color: var(--lge-text-primary);
+}
+
+.lge-scale-bar-gis .lge-scale-label-start {
+    text-align: left;
+}
+
+.lge-scale-bar-gis .lge-scale-label-middle {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.lge-scale-bar-gis .lge-scale-label-end {
+    text-align: right;
+}
+
+/* 简约线条样式 */
+.lge-scale-bar-minimal {
+    background: rgba(255, 255, 255, 0.9);
+    padding: var(--lge-spacing-xs) 6px;
+    border-radius: var(--lge-radius-sm);
+    box-shadow: var(--lge-shadow-md);
+}
+
+.lge-scale-bar-minimal .lge-scale-bar-top-line {
+    height: 3px;
+    background: var(--lge-border-dark);
+    border-left: 2px solid var(--lge-border-dark);
+    border-right: 2px solid var(--lge-border-dark);
+}
+
+.lge-scale-bar-minimal .lge-scale-bar-label {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-xs);
+    font-weight: 600;
+    color: var(--lge-text-primary);
+    text-align: center;
+    margin-top: 2px;
+}
+
+/* 双行对比样式 */
+.lge-scale-bar-double {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 6px 8px;
+    border-radius: var(--lge-radius-md);
+    box-shadow: var(--lge-shadow-md);
+}
+
+.lge-scale-bar-double .lge-scale-row {
+    margin-bottom: var(--lge-spacing-xs);
+}
+
+.lge-scale-bar-double .lge-scale-row:last-child {
+    margin-bottom: 0;
+}
+
+.lge-scale-bar-double .lge-scale-bar-label {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-xs);
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 2px;
+    color: var(--lge-text-primary);
+}
+
+.lge-scale-bar-double .lge-scale-bar-line {
+    display: flex;
+    height: 5px;
+    border: 1px solid var(--lge-border-dark);
+    border-top: none;
+}
+
+.lge-scale-bar-double .lge-scale-segment {
+    height: 100%;
+}

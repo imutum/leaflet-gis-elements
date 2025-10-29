@@ -178,8 +178,8 @@ const EXPORT_INCLUDE_SELECTORS = [
     '.leaflet-control-scale-bar',
     '.leaflet-control-north-arrow',
     '.leaflet-control-graticule',
-    '.graticule-frame',
-    '.graticule-label'
+    '.lge-graticule-frame',
+    '.lge-graticule-label'
 ];
 
 // ==================== 控件默认配置 ====================

@@ -10,27 +10,27 @@
         renderContainer: (layers) => {
             if (!layers || layers.length === 0) {
                 return `
-                    <div class="legend-modern-container">
-                        <div class="legend-modern-header">
-                            <span class="legend-modern-title">图例</span>
+                    <div class="lge-legend-modern-container">
+                        <div class="lge-legend-modern-header">
+                            <span class="lge-legend-modern-title">图例</span>
                         </div>
-                        <div class="legend-modern-content">
-                            <div class="legend-modern-empty">暂无图层</div>
+                        <div class="lge-legend-modern-content">
+                            <div class="lge-legend-modern-empty">暂无图层</div>
                         </div>
                     </div>
                 `;
             }
 
             const itemsHtml = layers.map(layer =>
-                `<div class="legend-modern-item">${LegendModernStyle.renderItem(layer)}</div>`
+                `<div class="lge-legend-modern-item">${LegendModernStyle.renderItem(layer)}</div>`
             ).join('');
 
             return `
-                <div class="legend-modern-container">
-                    <div class="legend-modern-header">
-                        <span class="legend-modern-title">图例</span>
+                <div class="lge-legend-modern-container">
+                    <div class="lge-legend-modern-header">
+                        <span class="lge-legend-modern-title">图例</span>
                     </div>
-                    <div class="legend-modern-content">
+                    <div class="lge-legend-modern-content">
                         ${itemsHtml}
                     </div>
                 </div>
@@ -38,7 +38,7 @@
         },
 
         renderItem: (layer) => {
-            let content = `<div class="legend-modern-layer-name">${layer.name || '未命名图层'}</div>`;
+            let content = `<div class="lge-legend-modern-layer-name">${layer.name || '未命名图层'}</div>`;
 
             if (layer.type === 'gradient') {
                 content += LegendModernStyle.renderGradientLegend(layer);
@@ -57,12 +57,12 @@
             const gradient = `linear-gradient(to right, ${colors.join(', ')})`;
 
             return `
-                <div class="legend-modern-gradient">
-                    <div class="legend-modern-colorbar" style="background: ${gradient};"></div>
-                    <div class="legend-modern-labels">
-                        ${labels.map(label => `<span class="legend-modern-label">${label}</span>`).join('')}
+                <div class="lge-legend-modern-gradient">
+                    <div class="lge-legend-modern-colorbar" style="background: ${gradient};"></div>
+                    <div class="lge-legend-modern-labels">
+                        ${labels.map(label => `<span class="lge-legend-modern-label">${label}</span>`).join('')}
                     </div>
-                    ${unit ? `<div class="legend-modern-unit">${unit}</div>` : ''}
+                    ${unit ? `<div class="lge-legend-modern-unit">${unit}</div>` : ''}
                 </div>
             `;
         },
@@ -77,21 +77,21 @@
             switch (type) {
                 case 'point':
                     // 圆形点
-                    symbolHtml = `<div class="legend-modern-symbol-point" style="background: ${color};"></div>`;
+                    symbolHtml = `<div class="lge-legend-modern-symbol-point" style="background: ${color};"></div>`;
                     break;
                 case 'line':
                     // 线条
-                    symbolHtml = `<div class="legend-modern-symbol-line" style="background: ${color};"></div>`;
+                    symbolHtml = `<div class="lge-legend-modern-symbol-line" style="background: ${color};"></div>`;
                     break;
                 case 'polygon':
                 default:
                     // 矩形（面）
-                    symbolHtml = `<div class="legend-modern-symbol-polygon" style="background: ${color}; opacity: ${fillOpacity};"></div>`;
+                    symbolHtml = `<div class="lge-legend-modern-symbol-polygon" style="background: ${color}; opacity: ${fillOpacity};"></div>`;
                     break;
             }
 
             return `
-                <div class="legend-modern-simple">
+                <div class="lge-legend-modern-simple">
                     ${symbolHtml}
                 </div>
             `;

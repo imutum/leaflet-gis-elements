@@ -15,7 +15,7 @@ class MapController {
             scaleBar: null,
             legend: null,
             graticule: null,
-            export: null
+            mapInfo: null
         };
 
         // Leaflet控件引用
@@ -24,7 +24,7 @@ class MapController {
             scaleBar: null,
             legend: null,
             graticule: null,
-            export: null
+            mapInfo: null
         };
 
         // 控件可见性状态
@@ -33,7 +33,7 @@ class MapController {
             scaleBar: true,
             legend: true,
             graticule: true,
-            export: true
+            mapInfo: true
         };
 
         // 初始化
@@ -99,6 +99,8 @@ class MapController {
         // 创建经纬度格网
         const graticuleOptions = this.options.graticule || {};
         this.controls.graticule = new L.Control.Graticule({
+            position: graticuleOptions.position || 'topleft',
+            style: graticuleOptions.style || 'simple',
             interval: graticuleOptions.interval || null,
             lngInterval: graticuleOptions.lngInterval || null,
             latInterval: graticuleOptions.latInterval || null,
@@ -106,28 +108,35 @@ class MapController {
             enabled: graticuleOptions.enabled !== false,
             frameEnabled: graticuleOptions.frameEnabled !== false,
             frameDraggable: graticuleOptions.frameDraggable !== false,
-            frameResizable: graticuleOptions.frameResizable !== false
+            frameResizable: graticuleOptions.frameResizable !== false,
+            draggable: graticuleOptions.draggable !== false
         });
+        this.leafletControls.graticule = this.controls.graticule.createControl();
 
         if (this.visibility.graticule) {
-            this.controls.graticule.addTo(this.map);
+            this.leafletControls.graticule.addTo(this.map);
         }
 
-        // 创建导出控件
-        if (typeof L.Control.Export !== 'undefined') {
-            const exportOptions = this.options.export || {};
-            this.controls.export = new L.Control.Export({
-                position: exportOptions.position || 'topright',
-                exportArea: exportOptions.exportArea || 'graticule',
-                format: exportOptions.format || 'png',
-                quality: exportOptions.quality || 1.0,
-                filename: exportOptions.filename || 'thematic_map'
-            });
-            this.leafletControls.export = this.controls.export.createControl();
+        // 创建地图注记
+        const mapInfoOptions = this.options.mapInfo || {};
+        this.controls.mapInfo = new L.Control.MapInfo({
+            position: mapInfoOptions.position || 'topleft',
+            style: mapInfoOptions.style || 'professional',
+            title: mapInfoOptions.title || '',
+            subtitle: mapInfoOptions.subtitle || '',
+            author: mapInfoOptions.author || '',
+            organization: mapInfoOptions.organization || '',
+            date: mapInfoOptions.date || '',
+            dataSource: mapInfoOptions.dataSource || '',
+            projection: mapInfoOptions.projection || 'WGS84 / EPSG:4326',
+            scale: mapInfoOptions.scale || '1:100000',
+            notes: mapInfoOptions.notes || '',
+            draggable: mapInfoOptions.draggable !== false
+        });
+        this.leafletControls.mapInfo = this.controls.mapInfo.createControl();
 
-            if (this.visibility.export) {
-                this.leafletControls.export.addTo(this.map);
-            }
+        if (this.visibility.mapInfo) {
+            this.leafletControls.mapInfo.addTo(this.map);
         }
     }
 
@@ -229,18 +238,10 @@ class MapController {
      * @param {string} controlName - 控件名称
      */
     show(controlName) {
-        if (controlName === 'graticule') {
-            // 格网控件特殊处理
-            if (this.controls.graticule && !this.visibility.graticule) {
-                this.controls.graticule.addTo(this.map);
-                this.visibility.graticule = true;
-            }
-        } else {
-            const control = this.leafletControls[controlName];
-            if (control && !this.visibility[controlName]) {
-                control.addTo(this.map);
-                this.visibility[controlName] = true;
-            }
+        const control = this.leafletControls[controlName];
+        if (control && !this.visibility[controlName]) {
+            control.addTo(this.map);
+            this.visibility[controlName] = true;
         }
     }
 
@@ -249,18 +250,10 @@ class MapController {
      * @param {string} controlName - 控件名称
      */
     hide(controlName) {
-        if (controlName === 'graticule') {
-            // 格网控件特殊处理
-            if (this.controls.graticule && this.visibility.graticule) {
-                this.controls.graticule.remove();
-                this.visibility.graticule = false;
-            }
-        } else {
-            const control = this.leafletControls[controlName];
-            if (control && this.visibility[controlName]) {
-                this.map.removeControl(control);
-                this.visibility[controlName] = false;
-            }
+        const control = this.leafletControls[controlName];
+        if (control && this.visibility[controlName]) {
+            this.map.removeControl(control);
+            this.visibility[controlName] = false;
         }
     }
 
@@ -297,14 +290,14 @@ class MapController {
      * @param {string} controlName - 控件名称
      */
     resetPosition(controlName) {
-        // 格网控件没有位置重置功能（只有边框重置）
-        if (controlName === 'graticule') {
-            return;
-        }
         const control = this.controls[controlName];
         if (control && typeof control.resetPosition === 'function') {
             control.resetPosition();
-            this._showNotification(`${this._getControlDisplayName(controlName)}位置已重置`);
+
+            // 使用通知工具类显示消息
+            if (L.GISElements.Notification) {
+                L.GISElements.Notification.success(`${this._getControlDisplayName(controlName)}位置已重置`);
+            }
         }
     }
 
@@ -356,40 +349,11 @@ class MapController {
             northArrow: '指北针',
             scaleBar: '比例尺',
             legend: '图例',
-            graticule: '经纬度格网'
+            graticule: '经纬度格网',
+            mapInfo: '地图注记'
         };
         return names[controlName] || controlName;
     }
-
-    /**
-     * 显示通知消息
-     * @private
-     */
-    _showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'map-notification';
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            z-index: 10000;
-            animation: slideIn 0.3s ease-out;
-        `;
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            notification.style.transition = 'opacity 0.3s';
-            setTimeout(() => notification.remove(), 300);
-        }, 2000);
-    }
-
 
     /**
      * 销毁控制器

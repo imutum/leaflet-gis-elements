@@ -11,11 +11,11 @@
             const { width, label } = scaleData;
 
             return `
-                <div class="scale-bar-leaflet" style="width: ${width}px;">
-                    <div class="scale-bar-label">${label}</div>
-                    <div class="scale-bar-line">
-                        <div class="scale-segment" style="width: 50%; background: #000;"></div>
-                        <div class="scale-segment" style="width: 50%; background: #fff; border: 1px solid #000; border-left: none;"></div>
+                <div class="lge-scale-bar-leaflet" style="width: ${width}px;">
+                    <div class="lge-scale-bar-label">${label}</div>
+                    <div class="lge-scale-bar-line">
+                        <div class="lge-scale-segment" style="width: 50%; background: #000;"></div>
+                        <div class="lge-scale-segment" style="width: 50%; background: #fff; border: 1px solid #000; border-left: none;"></div>
                     </div>
                 </div>
             `;

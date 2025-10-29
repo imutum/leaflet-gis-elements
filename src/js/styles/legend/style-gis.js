@@ -1,37 +1,37 @@
 /**
- * GIS经典样式
- * 传统GIS图例样式
+ * GIS专业样式
+ * 专业GIS图例样式
  */
 
 (function () {
     const LegendGISStyle = {
-        name: 'GIS经典',
+        name: 'GIS专业',
 
         renderContainer: (layers) => {
             if (!layers || layers.length === 0) {
                 return `
-                    <div class="legend-gis-container">
-                        <div class="legend-gis-title">图例</div>
-                        <div class="legend-gis-no-layer">无图层</div>
+                    <div class="lge-legend-gis-container">
+                        <div class="lge-legend-gis-title">图例</div>
+                        <div class="lge-legend-gis-no-layer">无图层</div>
                     </div>
                 `;
             }
 
             const itemsHtml = layers.map((layer, index) => {
                 const marginTop = index > 0 ? 'style="margin-top: 8px;"' : '';
-                return `<div class="legend-gis-item" ${marginTop}>${LegendGISStyle.renderItem(layer)}</div>`;
+                return `<div class="lge-legend-gis-item" ${marginTop}>${LegendGISStyle.renderItem(layer)}</div>`;
             }).join('');
 
             return `
-                <div class="legend-gis-container">
-                    <div class="legend-gis-title">图例</div>
+                <div class="lge-legend-gis-container">
+                    <div class="lge-legend-gis-title">图例</div>
                     ${itemsHtml}
                 </div>
             `;
         },
 
         renderItem: (layer) => {
-            let content = `<div class="legend-gis-layer-name">${layer.name || '未命名图层'}</div>`;
+            let content = `<div class="lge-legend-gis-layer-name">${layer.name || '未命名图层'}</div>`;
 
             if (layer.type === 'gradient') {
                 content += LegendGISStyle.renderGradientLegend(layer);
@@ -51,12 +51,12 @@
             const gradient = `linear-gradient(to right, ${colors.join(', ')})`;
 
             return `
-                <div class="legend-gis-gradient">
-                    <div class="legend-gis-colorbar" style="background: ${gradient};"></div>
-                    <div class="legend-gis-labels">
-                        ${labels.map(label => `<div class="legend-gis-label">${label}</div>`).join('')}
+                <div class="lge-legend-gis-gradient">
+                    <div class="lge-legend-gis-colorbar" style="background: ${gradient};"></div>
+                    <div class="lge-legend-gis-labels">
+                        ${labels.map(label => `<div class="lge-legend-gis-label">${label}</div>`).join('')}
                     </div>
-                    ${unit ? `<div class="legend-gis-unit">${unit}</div>` : ''}
+                    ${unit ? `<div class="lge-legend-gis-unit">${unit}</div>` : ''}
                 </div>
             `;
         },
@@ -71,21 +71,21 @@
             switch (type) {
                 case 'point':
                     // 圆形点
-                    symbolHtml = `<div class="legend-gis-symbol-point" style="background: ${color};"></div>`;
+                    symbolHtml = `<div class="lge-legend-gis-symbol-point" style="background: ${color};"></div>`;
                     break;
                 case 'line':
                     // 线条
-                    symbolHtml = `<div class="legend-gis-symbol-line" style="background: ${color};"></div>`;
+                    symbolHtml = `<div class="lge-legend-gis-symbol-line" style="background: ${color};"></div>`;
                     break;
                 case 'polygon':
                 default:
                     // 矩形（面）
-                    symbolHtml = `<div class="legend-gis-symbol-polygon" style="background: ${LegendGISStyle.hexToRgba(color, fillOpacity)}; border: 2px solid ${color};"></div>`;
+                    symbolHtml = `<div class="lge-legend-gis-symbol-polygon" style="background: ${LegendGISStyle.hexToRgba(color, fillOpacity)}; border: 2px solid ${color};"></div>`;
                     break;
             }
 
             return `
-                <div class="legend-gis-simple">
+                <div class="lge-legend-gis-simple">
                     ${symbolHtml}
                 </div>
             `;

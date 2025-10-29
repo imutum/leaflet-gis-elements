@@ -11,9 +11,9 @@
             const { width, label } = scaleData;
 
             return `
-                <div class="scale-bar-minimal" style="width: ${width}px;">
-                    <div class="scale-bar-top-line"></div>
-                    <div class="scale-bar-label">${label}</div>
+                <div class="lge-scale-bar-minimal" style="width: ${width}px;">
+                    <div class="lge-scale-bar-top-line"></div>
+                    <div class="lge-scale-bar-label">${label}</div>
                 </div>
             `;
         }
