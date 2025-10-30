@@ -1,0 +1,1091 @@
+/**
+ * CSS变量定义
+ * 定义全局颜色、间距、字体等变量
+ */
+
+:root {
+    /* 主色调 */
+    --lge-primary-color: #667eea;
+    --lge-primary-hover: #5568d3;
+    --lge-primary-light: rgba(102, 126, 234, 0.1);
+
+    /* 次要颜色 */
+    --lge-secondary-color: #6c757d;
+    --lge-secondary-hover: #5a6268;
+
+    /* 语义化颜色 */
+    --lge-success-color: #4CAF50;
+    --lge-success-hover: #45a049;
+    --lge-info-color: #4A90E2;
+    --lge-info-hover: #3a7bc8;
+    --lge-warning-color: #ff9800;
+    --lge-danger-color: #f44336;
+
+    /* 文本颜色 */
+    --lge-text-primary: #333;
+    --lge-text-secondary: #555;
+    --lge-text-muted: #666;
+    --lge-text-light: #999;
+
+    /* 背景颜色 */
+    --lge-bg-white: #ffffff;
+    --lge-bg-light: #f8f9fa;
+    --lge-bg-lighter: #f1f1f1;
+    --lge-bg-border: #e0e0e0;
+
+    /* 边框颜色 */
+    --lge-border-color: #ddd;
+    --lge-border-dark: #333;
+
+    /* 阴影 */
+    --lge-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --lge-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --lge-shadow-lg: 0 2px 12px rgba(0, 0, 0, 0.15);
+
+    /* 圆角 */
+    --lge-radius-sm: 3px;
+    --lge-radius-md: 4px;
+    --lge-radius-lg: 6px;
+    --lge-radius-xl: 8px;
+
+    /* 间距 */
+    --lge-spacing-xs: 4px;
+    --lge-spacing-sm: 8px;
+    --lge-spacing-md: 12px;
+    --lge-spacing-lg: 15px;
+    --lge-spacing-xl: 20px;
+
+    /* 字体 */
+    --lge-font-family: Arial, 'Microsoft YaHei', sans-serif;
+    --lge-font-size-xs: 10px;
+    --lge-font-size-sm: 11px;
+    --lge-font-size-base: 13px;
+    --lge-font-size-md: 14px;
+    --lge-font-size-lg: 18px;
+
+    /* 过渡 */
+    --lge-transition-fast: 0.15s ease;
+    --lge-transition-base: 0.3s ease;
+    --lge-transition-slow: 0.5s ease;
+
+    /* Z-index */
+    --lge-z-index-base: 1000;
+    --lge-z-index-notification: 10000;
+
+    /* 焦点样式 */
+    --lge-focus-color: var(--lge-primary-color);
+    --lge-focus-width: 2px;
+    --lge-focus-offset: 2px;
+    --lge-focus-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+
+    /* 禁用状态 */
+    --lge-disabled-opacity: 0.5;
+    --lge-disabled-cursor: not-allowed;
+}
+/**
+ * Leaflet 控件基础样式
+ * 为自定义控件提供基础样式覆盖
+ */
+
+/* ========== 通用控件基类 ========== */
+/* 移除 Leaflet 默认样式，使用自定义样式 */
+.leaflet-control-north-arrow,
+.leaflet-control-scale-bar,
+.leaflet-control-legend,
+.leaflet-control-graticule,
+.leaflet-control-map-info {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    font-family: var(--lge-font-family);
+}
+
+/* 通用标签基类 - 减少重复 */
+.lge-label-base {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-sm);
+    font-weight: 600;
+    color: var(--lge-text-primary);
+    text-align: center;
+}
+
+/* 北箭头控件 */
+.leaflet-control-north-arrow {
+    transition: opacity var(--lge-transition-base);
+}
+
+.leaflet-control-north-arrow:hover {
+    opacity: 0.9;
+}
+
+.lge-north-arrow-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lge-north-arrow-content svg {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* 比例尺和图例控件 */
+.leaflet-control-scale-bar,
+.leaflet-control-legend {
+    background: transparent;
+}
+/**
+ * 比例尺控件主题样式
+ * 包含所有比例尺样式的定义
+ */
+
+/* Leaflet经典样式 */
+.lge-scale-bar-leaflet {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: var(--lge-shadow-sm);
+}
+
+.lge-scale-bar-leaflet .lge-scale-bar-label {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-sm);
+    font-weight: bold;
+    color: var(--lge-text-primary);
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+.lge-scale-bar-leaflet .lge-scale-bar-line {
+    display: flex;
+    height: 5px;
+    border: 2px solid #777;
+    border-top: none;
+}
+
+.lge-scale-bar-leaflet .lge-scale-segment {
+    height: 100%;
+}
+
+/* GIS经典样式 */
+.lge-scale-bar-gis-classic {
+    background: var(--lge-bg-white);
+    padding: 6px 8px;
+    border: 1px solid var(--lge-border-dark);
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.lge-scale-bar-gis-classic .lge-scale-bar-line-top,
+.lge-scale-bar-gis-classic .lge-scale-bar-line-bottom {
+    height: 2px;
+    background: #000;
+}
+
+.lge-scale-bar-gis-classic .lge-scale-bar-segments {
+    display: flex;
+    height: 10px;
+    margin: 1px 0;
+}
+
+.lge-scale-bar-gis-classic .lge-scale-segment-black {
+    width: 50%;
+    background: #000;
+}
+
+.lge-scale-bar-gis-classic .lge-scale-segment-white {
+    width: 50%;
+    background: #fff;
+    border: 1px solid #000;
+    border-left: none;
+}
+
+.lge-scale-bar-gis-classic .lge-scale-bar-label {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-sm);
+    font-weight: bold;
+    color: var(--lge-text-primary);
+    text-align: center;
+    margin-top: 3px;
+}
+
+/* GIS专业样式（棋盘格交替） */
+.lge-scale-bar-gis {
+    background: rgba(0, 0, 0, 0);
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0);
+    box-shadow: none;
+}
+
+.lge-scale-bar-gis .lge-scale-bar-ruler {
+    position: relative;
+    height: 20px;
+    border: 2px solid #000;
+}
+
+.lge-scale-bar-gis .lge-scale-segment {
+    position: absolute;
+    height: 50%;
+}
+
+.lge-scale-bar-gis .lge-scale-segment-black {
+    background: #000;
+}
+
+.lge-scale-bar-gis .lge-scale-segment-white {
+    background: #fff;
+}
+
+.lge-scale-bar-gis .lge-scale-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    position: relative;
+}
+
+.lge-scale-bar-gis .lge-scale-label {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-xs);
+    font-weight: bold;
+    color: var(--lge-text-primary);
+}
+
+.lge-scale-bar-gis .lge-scale-label-start {
+    text-align: left;
+}
+
+.lge-scale-bar-gis .lge-scale-label-middle {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.lge-scale-bar-gis .lge-scale-label-end {
+    text-align: right;
+}
+
+/* 简约线条样式 */
+.lge-scale-bar-minimal {
+    background: rgba(255, 255, 255, 0.9);
+    padding: var(--lge-spacing-xs) 6px;
+    border-radius: var(--lge-radius-sm);
+    box-shadow: var(--lge-shadow-md);
+}
+
+.lge-scale-bar-minimal .lge-scale-bar-top-line {
+    height: 3px;
+    background: var(--lge-border-dark);
+    border-left: 2px solid var(--lge-border-dark);
+    border-right: 2px solid var(--lge-border-dark);
+}
+
+.lge-scale-bar-minimal .lge-scale-bar-label {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-xs);
+    font-weight: 600;
+    color: var(--lge-text-primary);
+    text-align: center;
+    margin-top: 2px;
+}
+
+/* 双行对比样式 */
+.lge-scale-bar-double {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 6px 8px;
+    border-radius: var(--lge-radius-md);
+    box-shadow: var(--lge-shadow-md);
+}
+
+.lge-scale-bar-double .lge-scale-row {
+    margin-bottom: var(--lge-spacing-xs);
+}
+
+.lge-scale-bar-double .lge-scale-row:last-child {
+    margin-bottom: 0;
+}
+
+.lge-scale-bar-double .lge-scale-bar-label {
+    font-family: var(--lge-font-family);
+    font-size: var(--lge-font-size-xs);
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 2px;
+    color: var(--lge-text-primary);
+}
+
+.lge-scale-bar-double .lge-scale-bar-line {
+    display: flex;
+    height: 5px;
+    border: 1px solid var(--lge-border-dark);
+    border-top: none;
+}
+
+.lge-scale-bar-double .lge-scale-segment {
+    height: 100%;
+}
+/**
+ * 图例控件主题样式
+ * 包含所有图例样式的定义
+ */
+
+/* GIS经典样式 */
+.lge-legend-gis-container {
+    background: var(--lge-bg-white);
+    border: 2px solid var(--lge-border-dark);
+    padding: var(--lge-spacing-md);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    font-family: var(--lge-font-family);
+    min-width: 150px;
+    /* max-width和max-height由外层容器控制，以便动态调整 */
+    width: 100%;
+    height: 100%;
+    max-width: inherit;
+    max-height: inherit;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.lge-legend-gis-container:focus-visible {
+    outline: var(--lge-focus-width) solid var(--lge-focus-color);
+    outline-offset: var(--lge-focus-offset);
+}
+
+.lge-legend-gis-title {
+    font-size: var(--lge-font-size-base);
+    font-weight: bold;
+    margin-bottom: var(--lge-spacing-md);
+    color: var(--lge-text-primary);
+}
+
+.lge-legend-gis-no-layer {
+    font-size: var(--lge-font-size-sm);
+    color: var(--lge-text-muted);
+}
+
+.lge-legend-gis-item {
+    background: var(--lge-bg-white);
+}
+
+.lge-legend-gis-layer-name {
+    font-size: var(--lge-font-size-sm);
+    font-weight: 600;
+    color: var(--lge-text-primary);
+    margin-bottom: var(--lge-spacing-sm);
+}
+
+.lge-legend-gis-gradient {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lge-spacing-sm);
+}
+
+.lge-legend-gis-colorbar {
+    height: 20px;
+    border: 1px solid #000;
+}
+
+.lge-legend-gis-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--lge-font-size-xs);
+    color: var(--lge-text-primary);
+}
+
+.lge-legend-gis-label {
+    flex: 1;
+    text-align: center;
+}
+
+.lge-legend-gis-unit {
+    font-size: var(--lge-font-size-xs);
+    color: var(--lge-text-primary);
+    font-style: italic;
+    text-align: center;
+    margin-top: 2px;
+}
+
+.lge-legend-gis-simple {
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+}
+
+.lge-legend-gis-symbol {
+    width: 40px;
+    height: 20px;
+    border-radius: 2px;
+}
+
+.lge-legend-gis-symbol-polygon {
+    width: 50px;
+    height: 15px;
+    border-radius: 2px;
+}
+
+.lge-legend-gis-symbol-line {
+    width: 50px;
+    height: 5px;
+    border-radius: 1px;
+}
+
+.lge-legend-gis-symbol-point {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+/* 现代样式 */
+.lge-legend-modern-container {
+    background: var(--lge-bg-white);
+    border-radius: var(--lge-radius-xl);
+    box-shadow: var(--lge-shadow-lg);
+    overflow: hidden;
+    min-width: 180px;
+    /* max-width由外层容器控制，以便动态调整 */
+    width: 100%;
+    max-width: inherit;
+    box-sizing: border-box;
+}
+
+.lge-legend-modern-header {
+    background: linear-gradient(135deg, var(--lge-primary-color) 0%, #764ba2 100%);
+    color: white;
+    padding: var(--lge-spacing-md) var(--lge-spacing-lg);
+    font-weight: 600;
+    font-size: var(--lge-font-size-md);
+}
+
+.lge-legend-modern-title {
+    font-family: var(--lge-font-family);
+}
+
+.lge-legend-modern-content {
+    /* max-height由外层容器控制，以便动态调整 */
+    max-height: inherit;
+    overflow-y: auto;
+    padding: var(--lge-spacing-md);
+    box-sizing: border-box;
+}
+
+.lge-legend-modern-empty {
+    text-align: center;
+    color: var(--lge-text-light);
+    font-size: var(--lge-font-size-base);
+    padding: 10px;
+}
+
+.lge-legend-modern-item {
+    margin-bottom: var(--lge-spacing-md);
+    padding: var(--lge-spacing-md);
+    border-radius: var(--lge-radius-lg);
+    background: var(--lge-bg-light);
+    border: 1px solid var(--lge-border-color);
+}
+
+.lge-legend-modern-item:last-child {
+    margin-bottom: 0;
+}
+
+.lge-legend-modern-layer-name {
+    font-weight: 600;
+    font-size: var(--lge-font-size-base);
+    color: var(--lge-text-primary);
+    margin-bottom: var(--lge-spacing-sm);
+}
+
+.lge-legend-modern-gradient {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lge-spacing-sm);
+}
+
+.lge-legend-modern-colorbar {
+    height: 20px;
+    border-radius: var(--lge-radius-md);
+    border: 1px solid var(--lge-border-color);
+}
+
+.lge-legend-modern-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--lge-font-size-sm);
+    color: var(--lge-text-secondary);
+}
+
+.lge-legend-modern-label {
+    flex: 1;
+    text-align: center;
+}
+
+.lge-legend-modern-unit {
+    font-size: var(--lge-font-size-sm);
+    color: var(--lge-text-muted);
+    font-style: italic;
+    text-align: center;
+}
+
+.lge-legend-modern-simple {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 35px;
+}
+
+.lge-legend-modern-symbol {
+    width: 50px;
+    height: 25px;
+    border-radius: var(--lge-radius-md);
+    box-shadow: var(--lge-shadow-sm);
+}
+
+.lge-legend-modern-symbol-polygon {
+    width: 60px;
+    height: 15px;
+    border-radius: var(--lge-radius-md);
+    box-shadow: var(--lge-shadow-sm);
+}
+
+.lge-legend-modern-symbol-line {
+    width: 60px;
+    height: 5px;
+    border-radius: 2px;
+    box-shadow: var(--lge-shadow-sm);
+}
+
+.lge-legend-modern-symbol-point {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    box-shadow: var(--lge-shadow-sm);
+}
+/**
+ * 经纬度格网控件样式
+ */
+
+/* 基础样式 */
+.leaflet-control-graticule {
+    background: var(--lge-bg-white);
+    border-radius: var(--lge-radius-md);
+    box-shadow: var(--lge-shadow-md);
+    cursor: move;
+    user-select: none;
+}
+
+/* 格网边框样式（内层边框，被刻度标签包围，用于格网展示） */
+.lge-graticule-frame {
+    cursor: move;
+    background: transparent;
+    box-sizing: border-box;
+    /* 内层边框 - 黑色实线 */
+}
+
+/* 调整大小控制点 */
+.lge-resize-handle {
+    cursor: nwse-resize;
+    box-sizing: border-box;
+    /* 增强可访问性：确保触摸目标足够大 */
+    min-width: 20px;
+    min-height: 20px;
+}
+
+.lge-resize-handle:focus-visible {
+    outline: var(--lge-focus-width) solid var(--lge-focus-color);
+    outline-offset: var(--lge-focus-offset);
+}
+
+.lge-resize-handle.lge-resize-handle-topleft {
+    cursor: nwse-resize;
+}
+
+.lge-resize-handle.lge-resize-handle-topright {
+    cursor: nesw-resize;
+}
+
+.lge-resize-handle.lge-resize-handle-bottomleft {
+    cursor: nesw-resize;
+}
+
+.lge-resize-handle.lge-resize-handle-bottomright {
+    cursor: nwse-resize;
+}
+
+/* 格网标注通用样式 */
+.lge-graticule-label {
+    background: transparent;
+    border: none;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.lge-graticule-label span {
+    display: inline-block;
+    padding: 2px var(--lge-spacing-xs);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--lge-radius-sm);
+    font-size: var(--lge-font-size-sm);
+    font-weight: 600;
+    color: var(--lge-text-primary);
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* 经度标签位置 */
+.lge-graticule-label-longitude.lge-graticule-label-top span {
+    transform: translate(-50%, -150%);
+}
+
+.lge-graticule-label-longitude.lge-graticule-label-bottom span {
+    transform: translate(-50%, 50%);
+}
+
+/* 纬度标签位置 */
+.lge-graticule-label-latitude.lge-graticule-label-left span {
+    transform: translate(-110%, -50%);
+}
+
+.lge-graticule-label-latitude.lge-graticule-label-right span {
+    transform: translate(10%, -50%);
+}
+
+/* ==================== 样式变体 - 标签外观 ==================== */
+/* 简单样式的标注 - 淡色背景 */
+.lge-graticule-label-simple span {
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--lge-text-muted);
+    font-size: var(--lge-font-size-xs);
+}
+
+/* 密集样式的标注 - 蓝色背景 */
+.lge-graticule-label-dense span {
+    background: rgba(74, 144, 226, 0.9);
+    color: var(--lge-bg-white);
+    font-size: var(--lge-font-size-sm);
+    font-weight: 600;
+}
+
+/* 响应式调整已移至 utilities/responsive.css 统一管理 */
+/**
+ * 地图注记控件样式
+ * 用于显示地图标题、制图信息、数据来源等GIS专题图必备要素
+ */
+
+/* ==================== 基础样式 ==================== */
+.leaflet-control-map-info {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--lge-border-dark);
+    border-radius: var(--lge-radius-md);
+    box-shadow: var(--lge-shadow-md);
+    padding: var(--lge-spacing-md) var(--lge-spacing-lg);
+    font-family: var(--lge-font-family);
+    cursor: move;
+    user-select: none;
+}
+
+.leaflet-control-map-info:focus-visible {
+    outline: var(--lge-focus-width) solid var(--lge-focus-color);
+    outline-offset: var(--lge-focus-offset);
+}
+
+/* ==================== 专业版样式 ==================== */
+.lge-map-info-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1a1a1a;
+    text-align: center;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.lge-map-info-subtitle {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.lge-map-info-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #666, transparent);
+    margin: 10px 0;
+}
+
+.lge-map-info-metadata {
+    margin-top: 8px;
+}
+
+.lge-map-info-item {
+    display: flex;
+    margin-bottom: 4px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.lge-map-info-label {
+    color: #666;
+    min-width: 70px;
+    flex-shrink: 0;
+}
+
+.lge-map-info-value {
+    color: #333;
+    flex: 1;
+    word-break: break-word;
+}
+
+.lge-map-info-notes {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #ccc;
+    font-size: 11px;
+    color: #666;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+/* ==================== 紧凑版样式 ==================== */
+.lge-map-info-title-compact {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.lge-map-info-subtitle-compact {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.lge-map-info-metadata-compact {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.lge-map-info-extra-compact {
+    font-size: 10px;
+    color: #888;
+    line-height: 1.4;
+}
+
+.lge-map-info-notes-compact {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed #ddd;
+    font-size: 10px;
+    color: #666;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* 响应式样式已移至 utilities/responsive.css 统一管理 */
+/* 打印样式已移至 utilities/print.css 统一管理 */
+/**
+ * CSS辅助工具类
+ * 提供常用的工具类，避免重复定义
+ */
+
+/* ========== 文本工具 ========== */
+.lge-text-center {
+    text-align: center;
+}
+
+.lge-text-left {
+    text-align: left;
+}
+
+.lge-text-right {
+    text-align: right;
+}
+
+.lge-text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ========== 间距工具 ========== */
+.lge-mt-xs {
+    margin-top: var(--lge-spacing-xs);
+}
+
+.lge-mt-sm {
+    margin-top: var(--lge-spacing-sm);
+}
+
+.lge-mt-md {
+    margin-top: var(--lge-spacing-md);
+}
+
+.lge-mt-lg {
+    margin-top: var(--lge-spacing-lg);
+}
+
+.lge-mb-xs {
+    margin-bottom: var(--lge-spacing-xs);
+}
+
+.lge-mb-sm {
+    margin-bottom: var(--lge-spacing-sm);
+}
+
+.lge-mb-md {
+    margin-bottom: var(--lge-spacing-md);
+}
+
+.lge-mb-lg {
+    margin-bottom: var(--lge-spacing-lg);
+}
+
+.lge-pt-xs {
+    padding-top: var(--lge-spacing-xs);
+}
+
+.lge-pt-sm {
+    padding-top: var(--lge-spacing-sm);
+}
+
+.lge-pt-md {
+    padding-top: var(--lge-spacing-md);
+}
+
+.lge-pt-lg {
+    padding-top: var(--lge-spacing-lg);
+}
+
+.lge-pb-xs {
+    padding-bottom: var(--lge-spacing-xs);
+}
+
+.lge-pb-sm {
+    padding-bottom: var(--lge-spacing-sm);
+}
+
+.lge-pb-md {
+    padding-bottom: var(--lge-spacing-md);
+}
+
+.lge-pb-lg {
+    padding-bottom: var(--lge-spacing-lg);
+}
+
+/* ========== 显示工具 ========== */
+.lge-hidden {
+    display: none !important;
+}
+
+.lge-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ========== Flexbox工具 ========== */
+.lge-flex {
+    display: flex;
+}
+
+.lge-flex-column {
+    flex-direction: column;
+}
+
+.lge-flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lge-flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ========== 焦点样式（可访问性） ========== */
+.lge-focusable:focus-visible {
+    outline: var(--lge-focus-width) solid var(--lge-focus-color);
+    outline-offset: var(--lge-focus-offset);
+    box-shadow: var(--lge-focus-shadow);
+}
+
+/* 移除浏览器默认焦点样式 */
+.lge-focusable:focus {
+    outline: none;
+}
+/**
+ * 动画定义
+ * 为控件提供可复用的动画效果
+ */
+
+/* 淡入动画 */
+@keyframes lge-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* 淡出动画 */
+@keyframes lge-fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* 滑入动画 */
+@keyframes lge-slide-in {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 缩放动画 */
+@keyframes lge-scale-in {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* 动画工具类 */
+.lge-animate-fade-in {
+    animation: lge-fade-in var(--lge-transition-base);
+}
+
+.lge-animate-fade-out {
+    animation: lge-fade-out var(--lge-transition-base);
+}
+
+.lge-animate-slide-in {
+    animation: lge-slide-in var(--lge-transition-base);
+}
+
+.lge-animate-scale-in {
+    animation: lge-scale-in var(--lge-transition-base);
+}
+/**
+ * 响应式设计
+ * 集中管理所有控件的响应式样式
+ */
+
+/* 平板及以下 */
+@media (max-width: 768px) {
+
+    /* 北箭头和比例尺 */
+    .leaflet-control-north-arrow,
+    .leaflet-control-scale-bar {
+        font-size: var(--lge-font-size-sm);
+    }
+
+    /* 格网标签 */
+    .lge-graticule-label span {
+        font-size: 9px;
+        padding: 1px var(--lge-spacing-xs);
+    }
+
+    /* 地图注记 */
+    .leaflet-control-map-info {
+        max-width: 250px;
+        font-size: 90%;
+    }
+
+    .lge-map-info-title {
+        font-size: 16px;
+    }
+
+    .lge-map-info-subtitle {
+        font-size: 13px;
+    }
+
+    .lge-map-info-item {
+        font-size: 11px;
+    }
+}
+
+/* 手机 */
+@media (max-width: 480px) {
+
+    /* 可以添加更小屏幕的样式调整 */
+    .leaflet-control-north-arrow,
+    .leaflet-control-scale-bar,
+    .leaflet-control-legend {
+        font-size: var(--lge-font-size-xs);
+    }
+}
+/**
+ * 打印样式
+ * 确保控件在打印时正确显示
+ */
+
+@media print {
+
+    /* 控件定位调整 */
+    .leaflet-control-north-arrow,
+    .leaflet-control-scale-bar,
+    .leaflet-control-legend {
+        position: static;
+    }
+
+    /* 地图注记打印优化 */
+    .leaflet-control-map-info {
+        background: white;
+        box-shadow: none;
+        border: 1px solid #333;
+    }
+
+    /* 隐藏交互元素 */
+    .lge-resize-handle,
+    .lge-toggle-switch {
+        display: none;
+    }
+}
+/**
+ * LeafletGISElements 控件样式
+ * 
+ * 仅包含控件相关的样式，不包含全局样式
+ * 适用于打包到库中，不会污染其他项目的样式
+ */
+
+/* ========== 基础层 ========== */
+/* CSS 变量定义 */
+
+/* 控件基础样式 */
+
+/* ========== 控件层 ========== */
+/* 各控件主题和样式 */
+
+/* ========== 工具层 ========== */
+/* 动画、响应式、打印等工具样式 */
+
+/*# sourceMappingURL=leaflet-gis-elements.min.css.map*/

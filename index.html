@@ -10,10 +10,10 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <!-- Demo 页面样式 -->
-    <link rel="stylesheet" href="./styles/main.css" />
+    <link rel="stylesheet" href="./examples/styles/main.css" />
 
     <!-- LeafletGISElements CSS -->
-    <link rel="stylesheet" href="../dist/leaflet-gis-elements.min.css" />
+    <link rel="stylesheet" href="./dist/leaflet-gis-elements.min.css" />
 </head>
 
 <body>
@@ -29,19 +29,18 @@
 
         <!-- 经纬度格网 -->
         <div class="control-section">
-            <h4 style="cursor: pointer; user-select: none;" onclick="toggleSection('graticuleSection')">
-                📐 经纬度格网 <span id="graticuleToggle">▼</span>
+            <h4>
+                <label class="title-with-checkbox">
+                    <input type="checkbox" id="showGraticule" checked>
+                    <span class="title-text">📐 经纬度格网</span>
+                </label>
+                <span class="toggle-icon" onclick="toggleSection('graticuleSection')" id="graticuleToggle">▼</span>
             </h4>
             <div id="graticuleSection">
-                <div class="control-group">
-                    <label>
-                        <input type="checkbox" id="showGraticule" checked>
-                        <strong>显示格网</strong>
-                    </label>
-                    <small style="color: #666; font-size: 11px; display: block; margin-left: 20px;">
-                        格网边框可拖动调整，用于精确定义导出范围
-                    </small>
-                </div>
+                <small
+                    style="color: #666; font-size: 11px; display: block; margin-bottom: 10px; padding: 6px 8px; background: #fff3cd; border-radius: 4px;">
+                    💡 格网边框可拖动调整，用于精确定义导出范围
+                </small>
                 <div class="control-group">
                     <label>
                         <input type="checkbox" id="showGraticuleLines" checked> 显示经纬线
@@ -135,16 +134,14 @@
 
         <!-- 地图注记 -->
         <div class="control-section">
-            <h4 style="cursor: pointer; user-select: none;" onclick="toggleSection('mapInfoSection')">
-                📝 地图注记 <span id="mapInfoToggle">▼</span>
+            <h4>
+                <label class="title-with-checkbox">
+                    <input type="checkbox" id="showMapInfo" checked>
+                    <span class="title-text">📝 地图注记</span>
+                </label>
+                <span class="toggle-icon" onclick="toggleSection('mapInfoSection')" id="mapInfoToggle">▼</span>
             </h4>
             <div id="mapInfoSection">
-                <div class="control-group">
-                    <label>
-                        <input type="checkbox" id="showMapInfo" checked>
-                        <strong>显示注记</strong>
-                    </label>
-                </div>
                 <div class="control-group">
                     <label for="mapInfoStyle">注记样式：</label>
                     <select id="mapInfoStyle"></select>
@@ -235,16 +232,14 @@
 
         <!-- 指北针 -->
         <div class="control-section">
-            <h4 style="cursor: pointer; user-select: none;" onclick="toggleSection('northArrowSection')">
-                🧭 指北针 <span id="northArrowToggle">▼</span>
+            <h4>
+                <label class="title-with-checkbox">
+                    <input type="checkbox" id="showNorthArrow" checked>
+                    <span class="title-text">🧭 指北针</span>
+                </label>
+                <span class="toggle-icon" onclick="toggleSection('northArrowSection')" id="northArrowToggle">▼</span>
             </h4>
             <div id="northArrowSection">
-                <div class="control-group">
-                    <label>
-                        <input type="checkbox" id="showNorthArrow" checked>
-                        <strong>显示指北针</strong>
-                    </label>
-                </div>
                 <div class="control-group">
                     <label for="northArrowStyle">样式：</label>
                     <select id="northArrowStyle"></select>
@@ -258,16 +253,14 @@
 
         <!-- 比例尺 -->
         <div class="control-section">
-            <h4 style="cursor: pointer; user-select: none;" onclick="toggleSection('scaleBarSection')">
-                📏 比例尺 <span id="scaleBarToggle">▼</span>
+            <h4>
+                <label class="title-with-checkbox">
+                    <input type="checkbox" id="showScaleBar" checked>
+                    <span class="title-text">📏 比例尺</span>
+                </label>
+                <span class="toggle-icon" onclick="toggleSection('scaleBarSection')" id="scaleBarToggle">▼</span>
             </h4>
             <div id="scaleBarSection">
-                <div class="control-group">
-                    <label>
-                        <input type="checkbox" id="showScaleBar" checked>
-                        <strong>显示比例尺</strong>
-                    </label>
-                </div>
                 <div class="control-group">
                     <label for="scaleBarStyle">样式：</label>
                     <select id="scaleBarStyle"></select>
@@ -281,16 +274,14 @@
 
         <!-- 图例 -->
         <div class="control-section">
-            <h4 style="cursor: pointer; user-select: none;" onclick="toggleSection('legendSection')">
-                🗺️ 图例 <span id="legendToggle">▼</span>
+            <h4>
+                <label class="title-with-checkbox">
+                    <input type="checkbox" id="showLegend" checked>
+                    <span class="title-text">🗺️ 图例</span>
+                </label>
+                <span class="toggle-icon" onclick="toggleSection('legendSection')" id="legendToggle">▼</span>
             </h4>
             <div id="legendSection">
-                <div class="control-group">
-                    <label>
-                        <input type="checkbox" id="showLegend" checked>
-                        <strong>显示图例</strong>
-                    </label>
-                </div>
                 <div class="control-group">
                     <label for="legendStyle">样式：</label>
                     <select id="legendStyle"></select>
@@ -313,67 +304,51 @@
         </div>
 
         <!-- 地图导出 -->
-        <div class="control-section"
-            style="background: #f8f9fa; border: 2px solid #2196F3; border-radius: 8px; padding: 12px;">
-            <h4 style="color: #333; margin-top: 0;">📥 地图导出</h4>
+        <div class="control-section export-section">
+            <h4>📥 地图导出</h4>
 
-            <div class="control-group" style="margin-bottom: 8px;">
-                <label for="exportFilename" style="color: #333; font-weight: 600;">文件名前缀：</label>
+            <div class="control-group">
+                <label for="exportFilename"><strong>文件名前缀：</strong></label>
                 <input type="text" id="exportFilename" value="thematic_map" placeholder="输入文件名">
                 <small style="color: #666; font-size: 11px; display: block; margin-top: 2px;">
                     💾 自动添加时间戳，避免文件覆盖
                 </small>
             </div>
 
-            <div class="control-group" style="margin-bottom: 8px;">
-                <label for="exportRange" style="color: #333; font-weight: 600;">导出范围：</label>
-                <select id="exportRange" style="font-weight: 500;">
+            <div class="control-group">
+                <label for="exportRange"><strong>导出范围：</strong></label>
+                <select id="exportRange">
                     <option value="graticule">🎯 经纬格网范围（推荐）</option>
                     <option value="viewport">📺 当前视口范围</option>
                     <option value="auto">🔍 自动识别（含所有要素）</option>
                 </select>
             </div>
 
-            <details style="margin-bottom: 8px;">
-                <summary style="cursor: pointer; font-size: 12px; color: #333; font-weight: 600; margin-bottom: 5px;">
+            <details>
+                <summary style="cursor: pointer; font-size: 12px; font-weight: 600; margin-bottom: 5px;">
                     导出内容选择
                 </summary>
-                <div
-                    style="padding: 8px; background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                        <label style="font-size: 12px; color: #333;">
-                            <input type="checkbox" id="exportIncludeBasemap" checked> 底图
-                        </label>
-                        <label style="font-size: 12px; color: #333;">
-                            <input type="checkbox" id="exportIncludeMapInfo" checked> 注记
-                        </label>
-                        <label style="font-size: 12px; color: #333;">
-                            <input type="checkbox" id="exportIncludeGraticule" checked> 格网
-                        </label>
-                        <label style="font-size: 12px; color: #333;">
-                            <input type="checkbox" id="exportIncludeLegend" checked> 图例
-                        </label>
-                        <label style="font-size: 12px; color: #333;">
-                            <input type="checkbox" id="exportIncludeScaleBar" checked> 比例尺
-                        </label>
-                        <label style="font-size: 12px; color: #333;">
-                            <input type="checkbox" id="exportIncludeNorthArrow" checked> 指北针
-                        </label>
-                    </div>
+                <div class="export-content-grid">
+                    <label><input type="checkbox" id="exportIncludeBasemap" checked> 底图</label>
+                    <label><input type="checkbox" id="exportIncludeMapInfo" checked> 注记</label>
+                    <label><input type="checkbox" id="exportIncludeGraticule" checked> 格网</label>
+                    <label><input type="checkbox" id="exportIncludeLegend" checked> 图例</label>
+                    <label><input type="checkbox" id="exportIncludeScaleBar" checked> 比例尺</label>
+                    <label><input type="checkbox" id="exportIncludeNorthArrow" checked> 指北针</label>
                 </div>
             </details>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <div class="export-options-grid">
                 <div>
-                    <label for="exportFormat" style="color: #333; font-weight: 600; font-size: 12px;">格式：</label>
-                    <select id="exportFormat" style="font-size: 12px; padding: 5px; font-weight: 500;">
+                    <label for="exportFormat" style="font-size: 12px;"><strong>格式：</strong></label>
+                    <select id="exportFormat" style="font-size: 12px; padding: 5px;">
                         <option value="png">PNG</option>
                         <option value="jpg">JPG</option>
                     </select>
                 </div>
                 <div>
-                    <label for="exportScale" style="color: #333; font-weight: 600; font-size: 12px;">分辨率：</label>
-                    <select id="exportScale" style="font-size: 12px; padding: 5px; font-weight: 500;">
+                    <label for="exportScale" style="font-size: 12px;"><strong>分辨率：</strong></label>
+                    <select id="exportScale" style="font-size: 12px; padding: 5px;">
                         <option value="1">1x</option>
                         <option value="2" selected>2x ⭐</option>
                         <option value="3">3x</option>
@@ -382,37 +357,32 @@
                 </div>
             </div>
 
-            <div class="control-group" style="margin-bottom: 8px;">
-                <label for="exportQuality" style="color: #333; font-weight: 600;">质量：</label>
+            <div class="control-group">
+                <label for="exportQuality"><strong>质量：</strong></label>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <input type="range" id="exportQuality" value="1.0" min="0.1" max="1.0" step="0.1" style="flex: 1;"
                         oninput="document.getElementById('qualityValue').textContent = this.value">
-                    <span id="qualityValue" style="min-width: 30px; font-weight: 600; color: #333;">1.0</span>
+                    <span id="qualityValue" style="min-width: 30px; font-weight: 600;">1.0</span>
                 </div>
-                <div id="qualityRecommendation"
-                    style="font-size: 10px; margin-top: 5px; padding: 4px; border-radius: 3px; background: #e3f2fd; color: #333;">
+                <div id="qualityRecommendation" class="quality-recommendation">
                     ⭐ 最高质量 - 适合印刷和正式出版
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;">
-                <button id="previewExportButton"
-                    style="background-color: #fff; color: #333; font-size: 12px; padding: 8px; font-weight: 600; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+            <div class="export-buttons">
+                <button id="previewExportButton" class="btn-preview">
                     👁️ 预览
                 </button>
-                <button id="exportMapButton"
-                    style="background-color: #333; color: white; font-size: 12px; padding: 8px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer;">
+                <button id="exportMapButton" class="btn-export">
                     🖼️ 导出
                 </button>
             </div>
         </div>
 
         <!-- 使用提示 -->
-        <details class="control-section" style="border-top: 1px solid #eee; padding-top: 10px;">
-            <summary style="cursor: pointer; font-size: 13px; color: #666; font-weight: 600;">
-                💡 使用提示
-            </summary>
-            <div class="info-text" style="margin-top: 10px; padding-top: 0; border-top: none;">
+        <details class="control-section tips-section">
+            <summary>💡 使用提示</summary>
+            <div class="info-text">
                 <strong>工作流程：</strong><br>
                 1️⃣ 调整格网定义导出范围<br>
                 2️⃣ 配置各元素样式和尺寸<br>
@@ -435,12 +405,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <!-- LeafletGISElements JS -->
-    <script src="../dist/leaflet-gis-elements.min.js"></script>
+    <script src="./dist/leaflet-gis-elements.min.js"></script>
 
     <!-- Demo 应用脚本 -->
-    <script src="./js/config.js"></script>
-    <script src="./js/ui-controller.js"></script>
-    <script src="./js/demo.js"></script>
+    <script src="./examples/js/config.js"></script>
+    <script src="./examples/js/ui-controller.js"></script>
+    <script src="./examples/js/demo.js"></script>
 </body>
 
 </html>

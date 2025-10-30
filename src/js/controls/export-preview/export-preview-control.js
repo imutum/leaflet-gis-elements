@@ -210,19 +210,35 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
     _enableDragging() {
         if (!L.GISElements.Draggable) return;
 
+        let dragStartBounds = null;
+
         this.borderDraggable = new L.GISElements.Draggable(this.previewBorder, {
             threshold: 5,
             onDragStart: () => {
+                dragStartBounds = { ...this.exportBounds };
                 this.previewBorder.style.opacity = '0.7';
+                if (this.map.dragging) this.map.dragging.disable();
             },
-            onDragging: () => {
-                this._syncBounds();
+            onDragging: (delta) => {
+                // 手动计算并应用新位置
+                this.exportBounds.left = dragStartBounds.left + delta.x;
+                this.exportBounds.top = dragStartBounds.top + delta.y;
+                
+                this.previewBorder.style.left = this.exportBounds.left + 'px';
+                this.previewBorder.style.top = this.exportBounds.top + 'px';
+                
+                // 更新控制点位置
+                if (this.borderResizable) {
+                    this.borderResizable.updateHandlePositions();
+                }
+                
+                this.exporter?.setExportBounds(this.exportBounds);
             },
             onDragEnd: () => {
                 this.previewBorder.style.opacity = '1';
-                this._syncBounds();
-            },
-            updatePosition: true
+                if (this.map.dragging) this.map.dragging.enable();
+                this.exporter?.setExportBounds(this.exportBounds);
+            }
         });
 
         this.borderDraggable.enable();
@@ -266,6 +282,11 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
             height: parseInt(this.previewBorder.style.height) || 100
         };
         this.exporter?.setExportBounds(this.exportBounds);
+        
+        // 更新调整大小控制点的位置
+        if (this.borderResizable) {
+            this.borderResizable.updateHandlePositions();
+        }
     }
 
     /**
@@ -279,6 +300,11 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
         this.previewBorder.style.top = bounds.top + 'px';
         this.previewBorder.style.width = bounds.width + 'px';
         this.previewBorder.style.height = bounds.height + 'px';
+        
+        // 更新调整大小控制点的位置
+        if (this.borderResizable) {
+            this.borderResizable.updateHandlePositions();
+        }
     }
 
     // ==================== 导出执行 ====================
@@ -364,6 +390,30 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
         }
 
         return this;
+    }
+
+    /**
+     * 自动计算格网边界（公开方法，兼容示例代码）
+     * @public
+     */
+    autoCalculateExportBounds() {
+        if (!this.boundsCalculator) {
+            console.warn('BoundsCalculator 未初始化');
+            return null;
+        }
+        return this.boundsCalculator.calculateGraticuleBounds();
+    }
+
+    /**
+     * 自动计算所有元素边界（公开方法，兼容示例代码）
+     * @public
+     */
+    autoCalculateAllElementsBounds() {
+        if (!this.boundsCalculator) {
+            console.warn('BoundsCalculator 未初始化');
+            return null;
+        }
+        return this.boundsCalculator.calculateAllElementsBounds();
     }
 
     // ==================== 导出配置 ====================

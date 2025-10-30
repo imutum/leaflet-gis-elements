@@ -30,7 +30,7 @@ yarn-error.log*
 package-lock.json
 
 # Webpack build output
-dist/
+# dist/
 *.map
 
 # Old structure (待清理)

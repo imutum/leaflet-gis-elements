@@ -521,18 +521,22 @@
 
         this._bindCheckbox('showMapInfo', function (checked) {
             self.controller[checked ? 'show' : 'hide']('mapInfo');
+            self._toggleSettingsPanel('mapInfoSection', checked, 'showMapInfo');
         });
 
         this._bindCheckbox('showNorthArrow', function (checked) {
             self.controller[checked ? 'show' : 'hide']('northArrow');
+            self._toggleSettingsPanel('northArrowSection', checked, 'showNorthArrow');
         });
 
         this._bindCheckbox('showScaleBar', function (checked) {
             self.controller[checked ? 'show' : 'hide']('scaleBar');
+            self._toggleSettingsPanel('scaleBarSection', checked, 'showScaleBar');
         });
 
         this._bindCheckbox('showLegend', function (checked) {
             self.controller[checked ? 'show' : 'hide']('legend');
+            self._toggleSettingsPanel('legendSection', checked, 'showLegend');
         });
 
         this._bindCheckbox('showGraticule', function (checked) {
@@ -542,6 +546,7 @@
             } else {
                 self.controller.controls.graticule.disable();
             }
+            self._toggleSettingsPanel('graticuleSection', checked, 'showGraticule');
         });
 
         this._bindCheckbox('showGraticuleLines', function (checked) {
@@ -550,6 +555,89 @@
 
         this._bindCheckbox('showGraticuleFrame', function (checked) {
             self.controller.controls.graticule[checked ? 'enableFrame' : 'disableFrame']();
+        });
+
+        // 初始化时应用当前状态
+        this._initializeSettingsState();
+    };
+
+    /**
+     * 切换设置面板的启用/禁用状态
+     */
+    UIController.prototype._toggleSettingsPanel = function (sectionId, enabled, excludeCheckboxId) {
+        // sectionId 是内容区域的 id（如 mapInfoSection）
+        var contentSection = document.getElementById(sectionId);
+        if (!contentSection) return;
+
+        // 获取父级 .control-section 元素
+        var controlSection = contentSection.parentElement;
+        if (!controlSection || !controlSection.classList.contains('control-section')) return;
+
+        var settingsContainer = contentSection.querySelector('.settings-container');
+        if (!settingsContainer) {
+            // 如果还没有设置容器，创建一个
+            this._wrapSettingsInContainer(controlSection, excludeCheckboxId);
+            settingsContainer = contentSection.querySelector('.settings-container');
+        }
+
+        if (settingsContainer) {
+            if (enabled) {
+                // 启用：显示设置区域，移除禁用样式
+                settingsContainer.style.display = '';
+                settingsContainer.classList.remove('settings-disabled');
+                controlSection.classList.remove('section-collapsed');
+            } else {
+                // 禁用：隐藏设置区域，添加禁用样式
+                settingsContainer.style.display = 'none';
+                settingsContainer.classList.add('settings-disabled');
+                controlSection.classList.add('section-collapsed');
+            }
+        }
+    };
+
+    /**
+     * 将设置区域包装在容器中
+     */
+    UIController.prototype._wrapSettingsInContainer = function (section, excludeCheckboxId) {
+        // 创建设置容器
+        var container = document.createElement('div');
+        container.className = 'settings-container';
+
+        // 主复选框现在在h4标题中，所以只需要包装section内的内容div
+        // 找到设置内容区域（h4的下一个兄弟元素）
+        var h4 = section.querySelector('h4');
+        var contentDiv = h4 ? h4.nextElementSibling : null;
+
+        if (contentDiv && contentDiv.id) {
+            // 将contentDiv的所有子元素移到容器中
+            var children = Array.from(contentDiv.children);
+            children.forEach(function (child) {
+                container.appendChild(child);
+            });
+
+            // 将容器添加回contentDiv
+            contentDiv.appendChild(container);
+        }
+    };
+
+    /**
+     * 初始化设置面板状态
+     */
+    UIController.prototype._initializeSettingsState = function () {
+        var mappings = [
+            { checkbox: 'showMapInfo', section: 'mapInfoSection' },
+            { checkbox: 'showNorthArrow', section: 'northArrowSection' },
+            { checkbox: 'showScaleBar', section: 'scaleBarSection' },
+            { checkbox: 'showLegend', section: 'legendSection' },
+            { checkbox: 'showGraticule', section: 'graticuleSection' }
+        ];
+
+        var self = this;
+        mappings.forEach(function (mapping) {
+            var checkbox = document.getElementById(mapping.checkbox);
+            if (checkbox) {
+                self._toggleSettingsPanel(mapping.section, checkbox.checked, mapping.checkbox);
+            }
         });
     };
 

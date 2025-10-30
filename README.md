@@ -21,6 +21,7 @@
 - 🎨 **多样式主题** - 提供多种预设样式，支持自定义主题开发
 - 🖱️ **可拖拽控件** - 所有控件支持拖拽定位，位置自动本地保存
 - 🎛️ **外部控制** - 控件无内置UI面板，通过API完全由外部控制
+- 🧠 **智能UI** - 控件未启用时设置自动折叠，界面简洁清晰
 - 📱 **响应式设计** - 完美支持桌面端和移动端，自适应屏幕尺寸
 - 🔧 **完整API** - 丰富的API接口，灵活控制所有行为
 - 📦 **开箱即用** - 提供完整示例和文档，快速上手
@@ -196,7 +197,7 @@ L.control.northArrow({ style: 'gis' }).addTo(map);
 - 自定义样式开发指南
 
 ### 🎨 样式系统文档
-**[src/css/README.md](src/css/README.md)** - CSS架构说明：
+**[test/src/css/README.md](test/src/css/README.md)** - CSS架构说明：
 - 样式组织结构和命名规范
 - 如何自定义和扩展样式
 - CSS变量系统使用
@@ -205,7 +206,7 @@ L.control.northArrow({ style: 'gis' }).addTo(map);
 
 ```
 leaflet-gis-elements/
-├── src/                           # 📦 插件源代码
+├── test/src/                      # 📦 插件源代码
 │   ├── js/                        # JavaScript源码
 │   │   ├── base/                  # 核心基类
 │   │   │   ├── base-control.js        # 控件基类
@@ -253,7 +254,8 @@ leaflet-gis-elements/
 │   │       ├── helpers.css            # 辅助类
 │   │       ├── print.css              # 打印样式
 │   │       └── responsive.css         # 响应式
-│   └── index.js                   # Webpack入口
+│   ├── index.js                   # Webpack入口
+│   └── index.d.ts                 # TypeScript类型定义
 │
 ├── dist/                          # 🚀 构建输出（发布到npm/CDN）
 │   ├── leaflet-gis-elements.min.js    # 压缩JS
@@ -330,7 +332,7 @@ npm run demo
 每个控件都支持自定义样式配置，有两种方式：
 
 1. **使用预设样式**：通过 `style` 参数选择内置样式
-2. **自定义样式对象**：参考 `src/js/styles/` 目录下的样式定义，创建自己的样式配置
+2. **自定义样式对象**：参考 `test/src/js/styles/` 目录下的样式定义，创建自己的样式配置
 
 详见 [docs/TYPES.md](docs/TYPES.md) 中的自定义样式章节。
 </details>
