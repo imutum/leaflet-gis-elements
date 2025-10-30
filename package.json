@@ -3,6 +3,8 @@
     "version": "1.0.0",
     "description": "可拖拽的 Leaflet 地图控件库 - 包含指北针、比例尺、图例、经纬网格等",
     "main": "dist/leaflet-gis-elements.js",
+    "types": "dist/leaflet-gis-elements.d.ts",
+    "typings": "dist/leaflet-gis-elements.d.ts",
     "unpkg": "dist/leaflet-gis-elements.min.js",
     "jsdelivr": "dist/leaflet-gis-elements.min.js",
     "style": "dist/leaflet-gis-elements.css",

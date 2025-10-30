@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -57,7 +58,20 @@ module.exports = (env, argv) => {
         plugins: [
             new MiniCssExtractPlugin({
                 filename: isProduction ? 'leaflet-gis-elements.min.css' : 'leaflet-gis-elements.css'
-            })
+            }),
+            // 复制类型定义文件到 dist 目录
+            {
+                apply: (compiler) => {
+                    compiler.hooks.afterEmit.tap('CopyTypesPlugin', () => {
+                        const srcPath = path.resolve(__dirname, 'src/index.d.ts');
+                        const destPath = path.resolve(__dirname, 'dist/leaflet-gis-elements.d.ts');
+                        if (fs.existsSync(srcPath)) {
+                            fs.copyFileSync(srcPath, destPath);
+                            console.log('✓ TypeScript 类型定义文件已复制到 dist 目录');
+                        }
+                    });
+                }
+            }
         ],
         optimization: {
             minimize: isProduction,

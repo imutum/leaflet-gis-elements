@@ -1,12 +1,11 @@
 /**
  * Demo 主样式文件
  * 统一管理示例页面的所有样式
+ * 
+ * 注意：CSS 变量已通过 leaflet-gis-elements.min.css 提供，无需重复导入
  */
 
-/* ========== 1. CSS 变量 ========== */
-@import '../../src/css/base/variables.css';
-
-/* ========== 2. 基础重置 ========== */
+/* ========== 1. 基础重置 ========== */
 * {
     box-sizing: border-box;
     margin: 0;
