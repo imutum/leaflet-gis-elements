@@ -9,7 +9,7 @@
 
 **基于 Leaflet 的模块化可拖拽地图控件库**
 
-[快速开始](#-快速开始) · [在线演示](#[-在线演示](https://imutum.github.io/leaflet-gis-elements/)) · [完整API文档](docs/TYPES.md)
+[快速开始](#-快速开始) · [在线演示](https://imutum.github.io/leaflet-gis-elements/) · [完整API文档](docs/TYPES.md)
 
 </div>
 
