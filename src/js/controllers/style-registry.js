@@ -13,7 +13,9 @@ L.GISElements.StyleRegistry = (function () {
         'north-arrow': {},
         'scale-bar': {},
         'legend': {},
-        'graticule': {}
+        'graticule': {},
+        'map-info': {},
+        'export-preview': {}
     };
 
     return {

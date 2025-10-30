@@ -82,6 +82,60 @@ Object.assign(L.GISElements, {
     version: '1.0.0',
 
     /**
+     * 预设配置
+     */
+    presets: {
+        // 学术样式预设
+        academic: {
+            autoShow: true,
+            northArrow: {
+                style: 'gis',
+                position: 'topleft',
+                size: 80,
+                draggable: true
+            },
+            scaleBar: {
+                style: 'gis',
+                position: 'bottomleft',
+                maxWidth: 200,
+                draggable: true
+            },
+            legend: {
+                style: 'gis',
+                position: 'bottomright',
+                layers: [],
+                draggable: true
+            },
+            mapInfo: {
+                style: 'professional',
+                position: 'topright',
+                draggable: true,
+                title: '专题地图',
+                subtitle: '',
+                author: '',
+                organization: '',
+                date: new Date().toISOString().split('T')[0],
+                dataSource: '',
+                projection: '',
+                scale: '',
+                notes: ''
+            },
+            graticule: {
+                enabled: true,
+                interval: 'auto',
+                showLines: true,
+                showFrame: true,
+                draggable: true
+            },
+            exportPreview: {
+                format: 'png',
+                quality: 1.0,
+                scale: 2
+            }
+        }
+    },
+
+    /**
      * 快速创建控制器
      * @param {L.Map} map - Leaflet地图实例
      * @param {Object} options - 配置选项
@@ -92,6 +146,69 @@ Object.assign(L.GISElements, {
             throw new Error('Map instance is required');
         }
         return new this.MapController(map, options);
+    },
+
+    /**
+     * 快速启动 - 一行代码完成所有配置（最简单的使用方式）
+     * @param {L.Map} map - Leaflet地图实例
+     * @param {Object} options - 快速配置选项
+     * @param {string} [options.preset] - 预设名称: academic, web, print, minimal
+     * @param {string} [options.title] - 地图标题
+     * @param {string} [options.subtitle] - 地图副标题
+     * @param {string} [options.author] - 作者/制图者
+     * @param {string} [options.organization] - 制图单位
+     * @param {string} [options.dataSource] - 数据来源
+     * @param {Array} [options.layers] - 图例图层数组
+     * @param {Object} [options.overrides] - 覆盖预设的其他配置
+     * @returns {MapController} 控制器实例
+     * 
+     * @example
+     * // 最简单的用法 - 使用学术样式预设
+     * L.GISElements.quickStart(map);
+     * 
+     * @example
+     * // 自定义内容
+     * L.GISElements.quickStart(map, {
+     *     title: '北京市温度分布图',
+     *     subtitle: '2025年10月气温数据',
+     *     author: '张三',
+     *     layers: [
+     *         { name: '温度', type: 'gradient', colors: ['#0000ff', '#ff0000'], labels: ['-10°C', '30°C'] }
+     *     ]
+     * });
+     */
+    quickStart: function (map, options = {}) {
+        if (!map) {
+            throw new Error('Map instance is required');
+        }
+
+        // 使用学术样式预设
+        const preset = this.presets[options.preset || 'academic'];
+
+        // 合并预设配置和用户覆盖配置
+        const config = Object.assign({}, preset, options.overrides || {});
+
+        // 创建控制器
+        const controller = new this.MapController(map, config);
+
+        // 快速设置地图信息（如果提供）
+        if (options.title || options.subtitle || options.author || options.organization || options.dataSource) {
+            const mapInfo = controller.getControl('mapInfo');
+            if (mapInfo) {
+                if (options.title) mapInfo.setTitle(options.title);
+                if (options.subtitle) mapInfo.setSubtitle(options.subtitle);
+                if (options.author) mapInfo.setAuthor(options.author);
+                if (options.organization) mapInfo.setOrganization(options.organization);
+                if (options.dataSource) mapInfo.setDataSource(options.dataSource);
+            }
+        }
+
+        // 快速设置图例图层（如果提供）
+        if (options.layers && Array.isArray(options.layers)) {
+            controller.updateLegendLayers(options.layers);
+        }
+
+        return controller;
     },
 
     /**

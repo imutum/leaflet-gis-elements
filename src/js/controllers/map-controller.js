@@ -15,7 +15,8 @@ class MapController {
             scaleBar: null,
             legend: null,
             graticule: null,
-            mapInfo: null
+            mapInfo: null,
+            exportPreview: null
         };
 
         // Leaflet控件引用
@@ -24,16 +25,19 @@ class MapController {
             scaleBar: null,
             legend: null,
             graticule: null,
-            mapInfo: null
+            mapInfo: null,
+            exportPreview: null
         };
 
         // 控件可见性状态
+        const autoShow = options.autoShow !== false; // 默认自动显示
         this.visibility = {
-            northArrow: true,
-            scaleBar: true,
-            legend: true,
-            graticule: true,
-            mapInfo: true
+            northArrow: autoShow,
+            scaleBar: autoShow,
+            legend: autoShow,
+            graticule: autoShow,
+            mapInfo: autoShow,
+            exportPreview: autoShow
         };
 
         // 初始化
@@ -46,7 +50,6 @@ class MapController {
      */
     _init() {
         this._createControls();
-        this._bindUIEvents();
     }
 
     /**
@@ -138,100 +141,24 @@ class MapController {
         if (this.visibility.mapInfo) {
             this.leafletControls.mapInfo.addTo(this.map);
         }
-    }
 
-    /**
-     * 绑定UI事件
-     * @private
-     */
-    _bindUIEvents() {
-        // 查找UI元素并绑定事件
-        this._bindControlEvent('northArrow', 'showNorthArrow', 'northArrowStyle');
-        this._bindControlEvent('scaleBar', 'showScaleBar', 'scaleBarStyle');
-        this._bindControlEvent('legend', 'showLegend', 'legendStyle');
+        // 创建导出预览控件
+        const exportOptions = this.options.exportPreview || {};
+        this.controls.exportPreview = new L.Control.ExportPreview({
+            position: exportOptions.position || 'topright',
+            format: exportOptions.format || 'png',
+            quality: exportOptions.quality || 1.0,
+            filename: exportOptions.filename || 'map',
+            scale: exportOptions.scale || 2,
+            autoCalculateBounds: exportOptions.autoCalculateBounds !== false
+        });
+        this.leafletControls.exportPreview = this.controls.exportPreview.createControl();
 
-        // 格网控件特殊处理（无UI控制面板）
-        this._bindGraticuleEvents();
-
-        // 绑定重置按钮
-        this._bindResetButton('resetNorthArrowPosition', 'northArrow');
-        this._bindResetButton('resetScaleBarPosition', 'scaleBar');
-        this._bindResetButton('resetLegendPosition', 'legend');
-        this._bindResetButton('resetGraticulePosition', 'graticule');
-    }
-
-    /**
-     * 绑定控件事件
-     * @private
-     */
-    _bindControlEvent(controlName, checkboxId, styleSelectId) {
-        // 显示/隐藏复选框
-        const checkbox = document.getElementById(checkboxId);
-        if (checkbox) {
-            checkbox.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    this.show(controlName);
-                } else {
-                    this.hide(controlName);
-                }
-            });
-            checkbox.checked = this.visibility[controlName];
-        }
-
-        // 样式切换下拉框
-        const styleSelect = document.getElementById(styleSelectId);
-        if (styleSelect && this.controls[controlName]) {
-            styleSelect.addEventListener('change', (e) => {
-                this.setStyle(controlName, e.target.value);
-            });
-            styleSelect.value = this.controls[controlName].getCurrentStyle();
+        if (this.visibility.exportPreview) {
+            this.leafletControls.exportPreview.addTo(this.map);
         }
     }
 
-    /**
-     * 绑定格网控件事件
-     * @private
-     */
-    _bindGraticuleEvents() {
-        // 格网线显示/隐藏复选框
-        const graticuleCheckbox = document.getElementById('showGraticule');
-        if (graticuleCheckbox && this.controls.graticule) {
-            graticuleCheckbox.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    this.controls.graticule.enable();
-                } else {
-                    this.controls.graticule.disable();
-                }
-            });
-            graticuleCheckbox.checked = this.controls.graticule.enabled;
-        }
-
-        // 格网边框显示/隐藏复选框
-        const frameCheckbox = document.getElementById('showGraticuleFrame');
-        if (frameCheckbox && this.controls.graticule) {
-            frameCheckbox.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    this.controls.graticule.enableFrame();
-                } else {
-                    this.controls.graticule.disableFrame();
-                }
-            });
-            frameCheckbox.checked = this.controls.graticule.frameEnabled;
-        }
-    }
-
-    /**
-     * 绑定重置按钮
-     * @private
-     */
-    _bindResetButton(buttonId, controlName) {
-        const button = document.getElementById(buttonId);
-        if (button) {
-            button.addEventListener('click', () => {
-                this.resetPosition(controlName);
-            });
-        }
-    }
 
     /**
      * 显示指定控件
@@ -275,13 +202,196 @@ class MapController {
      * @param {string} styleName - 样式名称
      */
     setStyle(controlName, styleName) {
-        // 格网控件没有样式切换功能
-        if (controlName === 'graticule') {
+        // 格网控件和导出控件没有样式切换功能
+        if (controlName === 'graticule' || controlName === 'exportPreview') {
             return;
         }
         const control = this.controls[controlName];
         if (control && typeof control.setStyle === 'function') {
             control.setStyle(styleName);
+        }
+    }
+
+    /**
+     * 设置控件标题（快捷方法）
+     * @param {string} controlName - 控件名称（通常是 'mapInfo'）
+     * @param {string} title - 标题文本
+     */
+    setTitle(controlName, title) {
+        const control = this.controls[controlName];
+        if (control && typeof control.setTitle === 'function') {
+            control.setTitle(title);
+        }
+    }
+
+    /**
+     * 设置控件副标题（快捷方法）
+     * @param {string} controlName - 控件名称（通常是 'mapInfo'）
+     * @param {string} subtitle - 副标题文本
+     */
+    setSubtitle(controlName, subtitle) {
+        const control = this.controls[controlName];
+        if (control && typeof control.setSubtitle === 'function') {
+            control.setSubtitle(subtitle);
+        }
+    }
+
+    /**
+     * 设置控件大小（快捷方法）
+     * @param {string} controlName - 控件名称（如 'northArrow'）
+     * @param {number} size - 大小值（像素）
+     */
+    setSize(controlName, size) {
+        const control = this.controls[controlName];
+        if (control && typeof control.setSize === 'function') {
+            control.setSize(size);
+        }
+    }
+
+    /**
+     * 设置控件宽度（快捷方法）
+     * @param {string} controlName - 控件名称（如 'scaleBar', 'legend'）
+     * @param {number} width - 宽度值（像素）
+     */
+    setWidth(controlName, width) {
+        const control = this.controls[controlName];
+        if (control) {
+            if (typeof control.setMaxWidth === 'function') {
+                control.setMaxWidth(width);
+            } else if (typeof control.setWidth === 'function') {
+                control.setWidth(width);
+            }
+        }
+    }
+
+    /**
+     * 设置图例图层（快捷方法，替代 updateLegendLayers）
+     * @param {string} controlName - 控件名称（通常是 'legend'）
+     * @param {Array} layers - 图层数组
+     */
+    setLayers(controlName, layers) {
+        const control = this.controls[controlName];
+        if (control && typeof control.setLayers === 'function') {
+            control.setLayers(layers);
+        }
+    }
+
+    /**
+     * 添加图层到图例（快捷方法）
+     * @param {string} controlName - 控件名称（通常是 'legend'）
+     * @param {Object} layer - 图层对象
+     */
+    addLayer(controlName, layer) {
+        const control = this.controls[controlName];
+        if (control && typeof control.addLayer === 'function') {
+            control.addLayer(layer);
+        }
+    }
+
+    /**
+     * 从图例移除图层（快捷方法）
+     * @param {string} controlName - 控件名称（通常是 'legend'）
+     * @param {string} layerName - 图层名称
+     */
+    removeLayer(controlName, layerName) {
+        const control = this.controls[controlName];
+        if (control && typeof control.removeLayer === 'function') {
+            control.removeLayer(layerName);
+        }
+    }
+
+    /**
+     * 获取导出器实例（快捷访问）
+     * @returns {MapExporter} 导出器实例
+     */
+    getExporter() {
+        if (this.controls.exportPreview) {
+            return this.controls.exportPreview.exporter;
+        }
+        return null;
+    }
+
+    /**
+     * 快速导出地图
+     * @param {Object} options - 导出选项
+     * @param {Array<string>} options.includeControls - 包含的控件名称数组
+     * @param {Array<string>} options.excludeControls - 排除的控件名称数组
+     * @param {string} options.format - 导出格式 (png/jpg)
+     * @param {number} options.quality - 导出质量 (0.1-1.0)
+     * @param {number} options.scale - 分辨率倍数 (1-4)
+     * @param {string} options.filename - 文件名
+     * @param {boolean} options.includeBasemap - 是否包含底图
+     * @returns {Promise} 导出结果
+     */
+    exportMap(options = {}) {
+        const exporter = this.getExporter();
+        if (!exporter) {
+            console.error('导出控件未初始化');
+            return Promise.reject(new Error('导出控件未初始化'));
+        }
+
+        // 清空之前的配置
+        exporter.clearUIElements();
+        exporter.clearLayers();
+
+        // 确定要导出的控件
+        let controlsToExport = [];
+        if (options.includeControls) {
+            controlsToExport = options.includeControls;
+        } else if (options.excludeControls) {
+            // 排除指定控件，导出其他所有控件
+            const allControls = ['northArrow', 'scaleBar', 'legend', 'graticule', 'mapInfo'];
+            controlsToExport = allControls.filter(name => !options.excludeControls.includes(name));
+        } else {
+            // 默认导出所有可见控件（除了exportPreview本身）
+            controlsToExport = Object.keys(this.visibility)
+                .filter(name => name !== 'exportPreview' && this.visibility[name]);
+        }
+
+        // 控件到CSS选择器的映射
+        const selectorMap = {
+            northArrow: '.leaflet-control-north-arrow',
+            scaleBar: '.leaflet-control-scale-bar',
+            legend: '.leaflet-control-legend',
+            mapInfo: '.leaflet-control-map-info'
+        };
+
+        // 添加UI控件到导出器
+        controlsToExport.forEach(controlName => {
+            if (controlName === 'graticule') {
+                // 格网需要特殊处理
+                this._addGraticuleToExporter(exporter);
+            } else if (selectorMap[controlName]) {
+                exporter.addUIElement(selectorMap[controlName]);
+            }
+        });
+
+        // 设置导出参数
+        if (options.format) exporter.setFormat(options.format);
+        if (options.quality !== undefined) exporter.setQuality(options.quality);
+        if (options.scale) exporter.setScale(options.scale);
+        if (options.filename) exporter.setFilename(options.filename);
+        if (options.includeBasemap !== undefined) exporter.setIncludeBasemap(options.includeBasemap);
+
+        // 执行导出
+        return exporter.export();
+    }
+
+    /**
+     * 添加格网到导出器
+     * @private
+     */
+    _addGraticuleToExporter(exporter) {
+        exporter.addUIElement('.lge-graticule-frame');
+
+        const graticuleControl = this.controls.graticule;
+        if (graticuleControl) {
+            graticuleControl.lines.forEach(line => {
+                exporter.addLayer(line);
+            });
+            graticuleControl.labels.forEach(label => {
+                exporter.addLayer(label);
+            });
         }
     }
 
@@ -350,9 +460,19 @@ class MapController {
             scaleBar: '比例尺',
             legend: '图例',
             graticule: '经纬度格网',
-            mapInfo: '地图注记'
+            mapInfo: '地图注记',
+            exportPreview: '导出预览'
         };
         return names[controlName] || controlName;
+    }
+
+    /**
+     * 获取指定控件实例
+     * @param {string} controlName - 控件名称
+     * @returns {Object} 控件实例
+     */
+    getControl(controlName) {
+        return this.controls[controlName];
     }
 
     /**

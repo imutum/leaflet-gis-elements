@@ -62,31 +62,8 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
     }
 
     render() {
-        if (!this.container) return;
-
-        const style = this.getCurrentStyleObject();
-        if (!style) {
-            console.warn(`导出预览样式 "${this.currentStyle}" 不存在`);
-            return;
-        }
-
-        this.container.innerHTML = style.render();
-        this._bindEvents();
-    }
-
-    // ==================== 事件绑定 ====================
-
-    _bindEvents() {
-        const previewBtn = this.container.querySelector('.lge-export-preview-btn');
-        const exportBtn = this.container.querySelector('.lge-export-btn');
-
-        if (previewBtn) {
-            previewBtn.addEventListener('click', () => this.togglePreview());
-        }
-
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.export());
-        }
+        // 导出预览控件不渲染UI，所有操作通过公开方法调用
+        // 按钮等UI应在示例代码中实现
     }
 
     // ==================== 预览边框管理 ====================
@@ -223,15 +200,15 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
                 // 手动计算并应用新位置
                 this.exportBounds.left = dragStartBounds.left + delta.x;
                 this.exportBounds.top = dragStartBounds.top + delta.y;
-                
+
                 this.previewBorder.style.left = this.exportBounds.left + 'px';
                 this.previewBorder.style.top = this.exportBounds.top + 'px';
-                
+
                 // 更新控制点位置
                 if (this.borderResizable) {
                     this.borderResizable.updateHandlePositions();
                 }
-                
+
                 this.exporter?.setExportBounds(this.exportBounds);
             },
             onDragEnd: () => {
@@ -282,7 +259,7 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
             height: parseInt(this.previewBorder.style.height) || 100
         };
         this.exporter?.setExportBounds(this.exportBounds);
-        
+
         // 更新调整大小控制点的位置
         if (this.borderResizable) {
             this.borderResizable.updateHandlePositions();
@@ -300,7 +277,7 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
         this.previewBorder.style.top = bounds.top + 'px';
         this.previewBorder.style.width = bounds.width + 'px';
         this.previewBorder.style.height = bounds.height + 'px';
-        
+
         // 更新调整大小控制点的位置
         if (this.borderResizable) {
             this.borderResizable.updateHandlePositions();

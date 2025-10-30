@@ -61,7 +61,7 @@ declare module 'leaflet' {
 
     class NorthArrow extends Control {
       constructor(options?: NorthArrowOptions);
-      
+
       /** 设置大小（像素） */
       setSize(size: number): void;
       /** 切换样式 */
@@ -105,10 +105,10 @@ declare module 'leaflet' {
 
     class ScaleBar extends Control {
       constructor(options?: ScaleBarOptions);
-      
+
       /** 当前比例尺数据 */
       scaleData: ScaleBarData;
-      
+
       /** 手动更新比例尺 */
       update(): void;
       /** 切换样式 */
@@ -157,7 +157,7 @@ declare module 'leaflet' {
 
     class Legend extends Control {
       constructor(options?: LegendOptions);
-      
+
       /** 设置所有图层数据 */
       setLayers(layers: LegendLayer[]): void;
       /** 添加单个图层 */
@@ -215,7 +215,7 @@ declare module 'leaflet' {
       latInterval?: number | null;
       /** 是否显示坐标标签，默认: true */
       showLabels?: boolean;
-      
+
       /** 经线颜色，默认: '#666' */
       meridianColor?: string;
       /** 经线宽度，默认: 1 */
@@ -224,7 +224,7 @@ declare module 'leaflet' {
       meridianOpacity?: number;
       /** 经线虚线样式，如 '5, 5'，默认: null（实线） */
       meridianDashArray?: string | null;
-      
+
       /** 纬线颜色，默认: '#666' */
       parallelColor?: string;
       /** 纬线宽度，默认: 1 */
@@ -233,19 +233,19 @@ declare module 'leaflet' {
       parallelOpacity?: number;
       /** 纬线虚线样式，默认: null（实线） */
       parallelDashArray?: string | null;
-      
+
       /** 统一颜色（兼容旧API，优先级低于单独设置） */
       color?: string;
       /** 统一宽度（兼容旧API，优先级低于单独设置） */
       weight?: number;
       /** 统一透明度（兼容旧API，优先级低于单独设置） */
       opacity?: number;
-      
+
       /** 标签字体大小（像素），默认: 11 */
       labelFontSize?: number;
       /** 标签字体类型，默认: 'Arial, sans-serif' */
       labelFontFamily?: string;
-      
+
       /** 是否显示格网边框，默认: true */
       frameEnabled?: boolean;
       /** 边框颜色，默认: '#333' */
@@ -260,19 +260,19 @@ declare module 'leaflet' {
       frameResizable?: boolean;
       /** 边框初始位置和大小（像素坐标） */
       frameRect?: GraticuleFrameRect;
-      
+
       /** 是否启用，默认: true */
       enabled?: boolean;
     }
 
     class Graticule extends Control {
       constructor(options?: GraticuleOptions);
-      
+
       /** 更新格网（updateFrame: 是否更新边框，默认true） */
       updateGraticule(updateFrame?: boolean): void;
       /** 清除所有格网元素 */
       clearGraticule(): void;
-      
+
       /** 启用格网显示 */
       enable(): void;
       /** 禁用格网显示 */
@@ -283,7 +283,7 @@ declare module 'leaflet' {
       showGraticule(): void;
       /** 隐藏格网（同 disable） */
       hideGraticule(): void;
-      
+
       /** 设置统一间隔（度数） */
       setInterval(interval: number): void;
       /** 设置经线间隔 */
@@ -296,7 +296,7 @@ declare module 'leaflet' {
       getLngInterval(): number;
       /** 获取当前纬线间隔 */
       getLatInterval(): number;
-      
+
       /** 启用边框 */
       enableFrame(): void;
       /** 禁用边框 */
@@ -309,7 +309,7 @@ declare module 'leaflet' {
       setFrameBounds(bounds: LatLngBounds): void;
       /** 获取边框范围（地理坐标，兼容旧API） */
       getFrameBounds(): LatLngBounds;
-      
+
       /** 设置经线样式 */
       setMeridianStyle(options: GraticuleLineStyle): void;
       /** 设置纬线样式 */
@@ -332,7 +332,7 @@ declare module 'leaflet' {
       draggable?: boolean;
       /** 样式名称: 'professional' | 'compact'，默认: 'professional' */
       style?: string;
-      
+
       /** 地图标题 */
       title?: string;
       /** 副标题 */
@@ -351,7 +351,7 @@ declare module 'leaflet' {
       scale?: string;
       /** 备注说明 */
       notes?: string;
-      
+
       /** 是否显示标题，默认: true */
       showTitle?: boolean;
       /** 是否显示副标题，默认: true */
@@ -370,7 +370,7 @@ declare module 'leaflet' {
       showScale?: boolean;
       /** 是否显示备注，默认: true */
       showNotes?: boolean;
-      
+
       /** 最大宽度，默认: 400 */
       maxWidth?: number;
       /** 最小宽度，默认: 200 */
@@ -403,7 +403,7 @@ declare module 'leaflet' {
 
     class MapInfo extends Control {
       constructor(options?: MapInfoOptions);
-      
+
       /** 设置标题 */
       setTitle(title: string): this;
       /** 设置副标题 */
@@ -422,27 +422,27 @@ declare module 'leaflet' {
       setScale(scale: string): this;
       /** 设置备注 */
       setNotes(notes: string): this;
-      
+
       /** 批量设置信息 */
       setInfo(info: Partial<MapInfoData>): this;
-      
+
       /** 显示字段 */
       showField(field: string): this;
       /** 隐藏字段 */
       hideField(field: string): this;
       /** 设置显示配置 */
       setShowConfig(config: Partial<MapInfoShowConfig>): this;
-      
+
       /** 设置最大宽度 */
       setMaxWidth(width: number): this;
       /** 设置最小宽度 */
       setMinWidth(width: number): this;
-      
+
       /** 获取信息 */
       getInfo(): MapInfoData;
       /** 获取显示配置 */
       getShowConfig(): MapInfoShowConfig;
-      
+
       /** 切换样式 */
       setStyle(styleName: string): void;
       /** 获取当前样式 */
@@ -468,7 +468,7 @@ declare module 'leaflet' {
       position?: ControlPosition;
       /** 样式名称: 'default' */
       style?: string;
-      
+
       /** 导出格式: 'png' | 'jpg'，默认: 'png' */
       format?: 'png' | 'jpg';
       /** 图片质量（0-1），默认: 1.0 */
@@ -477,7 +477,7 @@ declare module 'leaflet' {
       filename?: string;
       /** 导出缩放比例，默认: 2 */
       scale?: number;
-      
+
       /** 导出边界（像素坐标） */
       exportBounds?: ExportBounds;
       /** 是否自动计算边界，默认: true */
@@ -488,38 +488,51 @@ declare module 'leaflet' {
 
     class ExportPreview extends Control {
       constructor(options?: ExportPreviewOptions);
-      
+
       /** 预览是否可见 */
       previewVisible: boolean;
-      
+      /** 导出器实例 */
+      exporter: GISElements.MapExporter | null;
+      /** 边界计算器实例 */
+      boundsCalculator: GISElements.BoundsCalculator | null;
+
+      // ========== 预览边框管理 ==========
       /** 显示预览边框 */
       showPreview(): void;
       /** 隐藏预览边框 */
       hidePreview(): void;
       /** 切换预览边框显示 */
       togglePreview(): void;
-      
+
+      // ========== 导出执行 ==========
       /** 执行导出（异步） */
       export(): Promise<void>;
-      
+
+      // ========== 白名单管理 ==========
       /** 添加要导出的图层 */
       addLayer(layer: Layer): this;
       /** 添加要导出的UI元素 */
-      addUIElement(element: HTMLElement): this;
+      addUIElement(element: HTMLElement | string): this;
       /** 移除图层 */
       removeLayer(layer: Layer): this;
       /** 移除UI元素 */
-      removeUIElement(element: HTMLElement): this;
+      removeUIElement(element: HTMLElement | string): this;
       /** 清空白名单 */
       clearWhitelist(): this;
-      
+
+      // ========== 边界设置 ==========
       /** 设置导出边界 */
       setExportBounds(rect: ExportBounds): this;
       /** 设置边界计算模式 */
       setBoundsMode(mode: 'graticule' | 'all' | 'viewport'): this;
       /** 重新计算边界 */
       recalculateBounds(): this;
-      
+      /** 自动计算格网边界（兼容示例代码） */
+      autoCalculateExportBounds(): ExportBounds | null;
+      /** 自动计算所有元素边界（兼容示例代码） */
+      autoCalculateAllElementsBounds(): ExportBounds | null;
+
+      // ========== 导出配置 ==========
       /** 设置导出格式 */
       setFormat(format: 'png' | 'jpg'): this;
       /** 设置导出质量 */
@@ -528,7 +541,8 @@ declare module 'leaflet' {
       setFilename(filename: string): this;
       /** 设置缩放比例 */
       setScale(scale: number): this;
-      
+
+      // ========== 样式管理 ==========
       /** 切换样式 */
       setStyle(styleName: string): void;
       /** 获取当前样式 */
@@ -540,6 +554,72 @@ declare module 'leaflet' {
   namespace GISElements {
     /** 版本号 */
     const version: string;
+
+    // ========== 预设配置 ==========
+    interface PresetConfig {
+      /** 是否自动显示所有控件 */
+      autoShow?: boolean;
+      /** 指北针配置 */
+      northArrow?: Partial<Control.NorthArrowOptions>;
+      /** 比例尺配置 */
+      scaleBar?: Partial<Control.ScaleBarOptions>;
+      /** 图例配置 */
+      legend?: Partial<Control.LegendOptions>;
+      /** 地图注记配置 */
+      mapInfo?: Partial<Control.MapInfoOptions>;
+      /** 经纬网配置 */
+      graticule?: Partial<Control.GraticuleOptions>;
+      /** 导出预览配置 */
+      exportPreview?: Partial<Control.ExportPreviewOptions>;
+    }
+
+    /** 预设配置对象 */
+    interface Presets {
+      /** 学术样式预设 */
+      academic: PresetConfig;
+      [key: string]: PresetConfig;
+    }
+
+    const presets: Presets;
+
+    // ========== 快速启动配置 ==========
+    interface QuickStartOptions {
+      /** 预设名称 */
+      preset?: string;
+      /** 地图标题 */
+      title?: string;
+      /** 地图副标题 */
+      subtitle?: string;
+      /** 作者/制图者 */
+      author?: string;
+      /** 制图单位 */
+      organization?: string;
+      /** 数据来源 */
+      dataSource?: string;
+      /** 图例图层数组 */
+      layers?: Control.LegendLayer[];
+      /** 覆盖预设的其他配置 */
+      overrides?: Partial<PresetConfig>;
+    }
+
+    /**
+     * 快速启动 - 一行代码完成所有配置
+     * @param map Leaflet地图实例
+     * @param options 快速配置选项
+     * @returns 控制器实例
+     * @example
+     * // 最简单的用法
+     * L.GISElements.quickStart(map);
+     * 
+     * // 自定义内容
+     * L.GISElements.quickStart(map, {
+     *     title: '北京市温度分布图',
+     *     subtitle: '2025年10月气温数据',
+     *     author: '张三',
+     *     layers: [...]
+     * });
+     */
+    function quickStart(map: Map, options?: QuickStartOptions): MapController;
 
     // ========== 样式注册系统 ==========
     interface StyleObject {
@@ -621,20 +701,25 @@ declare module 'leaflet' {
     const config: GlobalConfig;
 
     // ========== 地图控制器 ==========
-    interface MapControllerControlOptions {
-      enabled?: boolean;
-      [key: string]: any;
+    interface MapControllerOptions extends PresetConfig {
+      // 继承 PresetConfig 的所有选项
     }
 
-    interface MapControllerOptions {
-      controls?: {
-        northArrow?: MapControllerControlOptions;
-        scaleBar?: MapControllerControlOptions;
-        legend?: MapControllerControlOptions;
-        graticule?: MapControllerControlOptions;
-        mapInfo?: MapControllerControlOptions;
-        exportPreview?: MapControllerControlOptions;
-      };
+    interface ExportMapOptions {
+      /** 包含的控件名称数组 */
+      includeControls?: string[];
+      /** 排除的控件名称数组 */
+      excludeControls?: string[];
+      /** 导出格式 (png/jpg) */
+      format?: 'png' | 'jpg';
+      /** 导出质量 (0.1-1.0) */
+      quality?: number;
+      /** 分辨率倍数 (1-4) */
+      scale?: number;
+      /** 文件名 */
+      filename?: string;
+      /** 是否包含底图 */
+      includeBasemap?: boolean;
     }
 
     interface MapController {
@@ -649,13 +734,67 @@ declare module 'leaflet' {
         mapInfo?: Control.MapInfo;
         exportPreview?: Control.ExportPreview;
       };
-      
-      /** 启用控件 */
-      enableControl(name: string): void;
-      /** 禁用控件 */
-      disableControl(name: string): void;
-      /** 获取控件 */
-      getControl(name: string): Control | null;
+      /** 控件可见性状态 */
+      visibility: {
+        northArrow: boolean;
+        scaleBar: boolean;
+        legend: boolean;
+        graticule: boolean;
+        mapInfo: boolean;
+        exportPreview: boolean;
+      };
+
+      // ========== 显示/隐藏控件 ==========
+      /** 显示指定控件 */
+      show(controlName: string): void;
+      /** 隐藏指定控件 */
+      hide(controlName: string): void;
+      /** 切换控件显示状态 */
+      toggle(controlName: string): void;
+
+      // ========== 样式控制 ==========
+      /** 设置控件样式 */
+      setStyle(controlName: string, styleName: string): void;
+
+      // ========== 快捷方法 ==========
+      /** 设置控件标题（通常用于 mapInfo） */
+      setTitle(controlName: string, title: string): void;
+      /** 设置控件副标题（通常用于 mapInfo） */
+      setSubtitle(controlName: string, subtitle: string): void;
+      /** 设置控件大小（通常用于 northArrow） */
+      setSize(controlName: string, size: number): void;
+      /** 设置控件宽度（通常用于 scaleBar, legend） */
+      setWidth(controlName: string, width: number): void;
+      /** 设置图层（通常用于 legend） */
+      setLayers(controlName: string, layers: Control.LegendLayer[]): void;
+      /** 添加图层（通常用于 legend） */
+      addLayer(controlName: string, layer: Control.LegendLayer): void;
+      /** 移除图层（通常用于 legend） */
+      removeLayer(controlName: string, layerName: string): void;
+
+      // ========== 图例快捷方法（兼容旧API） ==========
+      /** 更新图例图层 */
+      updateLegendLayers(layers: Control.LegendLayer[]): void;
+      /** 添加图例图层 */
+      addLegendLayer(layer: Control.LegendLayer): void;
+      /** 移除图例图层 */
+      removeLegendLayer(layerName: string): void;
+
+      // ========== 位置管理 ==========
+      /** 重置控件位置 */
+      resetPosition(controlName: string): void;
+      /** 重置所有控件位置 */
+      resetAllPositions(): void;
+
+      // ========== 导出功能 ==========
+      /** 获取导出器实例 */
+      getExporter(): MapExporter | null;
+      /** 快速导出地图 */
+      exportMap(options?: ExportMapOptions): Promise<void>;
+
+      // ========== 控件访问 ==========
+      /** 获取指定控件实例 */
+      getControl(controlName: string): Control | null;
       /** 销毁控制器 */
       destroy(): void;
     }
@@ -667,32 +806,115 @@ declare module 'leaflet' {
     function getAvailableStyles(controlType?: string): StyleInfo[] | Record<string, StyleInfo[]>;
 
     // ========== 导出相关 ==========
+    interface ExportDefaults {
+      FORMAT: string;
+      QUALITY: number;
+      SCALE: number;
+      BACKGROUND_COLOR: string;
+      INCLUDE_BASEMAP: boolean;
+      FILENAME: string;
+    }
+
+    interface ExportBoundsConfig {
+      DEFAULT_PADDING: number;
+      MIN_WIDTH: number;
+      MIN_HEIGHT: number;
+      DEFAULT_PREVIEW: {
+        left: number;
+        top: number;
+        width: number;
+        height: number;
+      };
+    }
+
     interface ExportConfig {
-      /** 默认导出格式 */
-      DEFAULT_FORMAT: string;
-      /** 默认图片质量 */
-      DEFAULT_QUALITY: number;
-      /** 默认文件名 */
-      DEFAULT_FILENAME: string;
-      /** 默认缩放比例 */
-      DEFAULT_SCALE: number;
-      /** 支持的格式 */
-      SUPPORTED_FORMATS: string[];
+      /** 默认导出设置 */
+      DEFAULTS: ExportDefaults;
+      /** 边界计算设置 */
+      BOUNDS: ExportBoundsConfig;
+      /** UI元素选择器 */
+      SELECTORS: {
+        GIS_ELEMENTS: string[];
+        GRATICULE: {
+          FRAME: string;
+          LABELS: string;
+        };
+        LEAFLET_PANES: {
+          TILE: string;
+          OVERLAY: string;
+          SHADOW: string;
+          MARKER: string;
+          TOOLTIP: string;
+          POPUP: string;
+        };
+      };
+      /** 预览边框样式 */
+      PREVIEW: {
+        BORDER_COLOR: string;
+        BORDER_WIDTH: number;
+        BACKGROUND_ALPHA: number;
+        HINT_TEXT: string;
+      };
+      /** 渲染等待时间(毫秒) */
+      RENDER_WAIT_TIME: number;
+      /** html2canvas配置 */
+      HTML2CANVAS: Record<string, any>;
+      /** 调试模式 */
+      DEBUG: boolean;
     }
 
     const ExportConfig: ExportConfig;
 
+    interface MapExporterOptions {
+      format?: 'png' | 'jpg';
+      quality?: number;
+      filename?: string;
+      scale?: number;
+    }
+
     class MapExporter {
-      constructor(map: Map, options?: any);
+      constructor(map: Map, options?: MapExporterOptions);
+
+      /** 设置导出格式 */
+      setFormat(format: 'png' | 'jpg'): void;
+      /** 设置导出质量 */
+      setQuality(quality: number): void;
+      /** 设置文件名 */
+      setFilename(filename: string): void;
+      /** 设置缩放比例 */
+      setScale(scale: number): void;
+      /** 设置是否包含底图 */
+      setIncludeBasemap(include: boolean): void;
+
+      /** 添加UI元素 */
+      addUIElement(selector: string | HTMLElement): void;
+      /** 添加图层 */
+      addLayer(layer: Layer): void;
+      /** 清空UI元素 */
+      clearUIElements(): void;
+      /** 清空图层 */
+      clearLayers(): void;
+
+      /** 执行导出 */
       export(): Promise<void>;
+    }
+
+    interface BoundsRect {
+      left: number;
+      top: number;
+      width: number;
+      height: number;
     }
 
     class BoundsCalculator {
       constructor(map: Map);
-      calculate(mode: string): any;
+
+      /** 根据模式计算边界 */
+      calculate(mode: 'graticule' | 'all' | 'viewport'): BoundsRect;
     }
 
     class SVGFixer {
+      /** 修复SVG元素以便导出 */
       static fix(svgElement: SVGElement): void;
     }
 
@@ -719,10 +941,38 @@ declare module 'leaflet' {
     }
 
     // ========== 调整大小工具 ==========
+    interface ResizableOptions {
+      /** 控制点位置数组，默认四个角 */
+      handles?: string[];
+      /** 最小宽度，默认100 */
+      minWidth?: number;
+      /** 最小高度，默认100 */
+      minHeight?: number;
+      /** 控制点颜色，默认#333 */
+      handleColor?: string;
+      /** 控制点大小，默认12 */
+      handleSize?: number;
+      /** 开始调整大小的回调 */
+      onResizeStart?: () => void;
+      /** 调整大小中的回调 */
+      onResizing?: (bounds: BoundsRect) => void;
+      /** 调整大小结束的回调 */
+      onResizeEnd?: (bounds: BoundsRect) => void;
+      /** 获取当前边界的回调 */
+      getBounds?: () => BoundsRect;
+      /** 设置边界的回调 */
+      setBounds?: (bounds: BoundsRect) => void;
+    }
+
     class Resizable {
-      constructor(element: HTMLElement, options?: any);
+      constructor(element: HTMLElement, options?: ResizableOptions);
+      /** 启用调整大小 */
       enable(): void;
+      /** 禁用调整大小 */
       disable(): void;
+      /** 更新控制点位置 */
+      updateHandlePositions(): void;
+      /** 销毁 */
       destroy(): void;
     }
 
@@ -756,6 +1006,6 @@ declare module 'leaflet' {
   }
 }
 
-export {};
+export { };
 
 

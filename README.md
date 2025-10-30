@@ -42,6 +42,16 @@
 
 ## 🎬 在线演示
 
+### 📄 多层次示例供选择
+
+1. **QuickStart 极简** ([examples/01-quickstart-minimal.html](examples/01-quickstart-minimal.html)) - 1行代码快速上手 ⭐⭐⭐ **最推荐新手**
+2. **QuickStart 自定义** ([examples/02-quickstart-custom.html](examples/02-quickstart-custom.html)) - 1行代码完成所有配置
+3. **统一 API 示例** ([examples/03-unified-api.html](examples/03-unified-api.html)) - 展示统一的快捷方法
+4. **预设配置示例** ([examples/simple.html](examples/simple.html)) - 使用预设配置
+5. **完整交互示例** ([examples/index.html](examples/index.html)) - 包含UI控制面板，展示所有功能
+
+### 🚀 本地运行
+
 ```bash
 # 克隆项目
 git clone https://github.com/your-repo/leaflet-gis-elements.git
@@ -100,7 +110,64 @@ npm run demo
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
         
-        // 3. 添加控件 - 方式1：单独添加
+        // ========== 🚀 方式1：quickStart() - 最简单（1行代码）⭐⭐⭐ ==========
+        // 🆕 新增！一行代码完成所有配置
+        const controller = L.GISElements.quickStart(map);
+        // 完成！使用默认预设和示例数据，所有控件已就绪
+        
+        // 或者自定义内容：
+        const controller2 = L.GISElements.quickStart(map, {
+            preset: 'academic',              // 预设名称
+            title: '北京市温度分布图',       // 地图标题
+            subtitle: '2025年10月数据',      // 副标题
+            author: '张三',                  // 作者
+            layers: [                        // 图例图层
+                { name: '温度', color: '#ff0000', type: 'polygon' }
+            ]
+        });
+        
+        // ========== 方式2：使用预设配置 ⭐⭐ ==========
+        const controller3 = L.GISElements.createController(map, 
+            L.GISElements.presets.academic  // 学术论文预设
+            // 其他预设：web, print, minimal
+        );
+        
+        // ========== 方式3：自定义配置（灵活控制）⭐ ==========
+        const controller4 = L.GISElements.createController(map, {
+            autoShow: true,  // 自动显示所有控件
+            northArrow: { 
+                style: 'compass',
+                position: 'topleft',
+                size: 80
+            },
+            scaleBar: { 
+                style: 'gis',
+                position: 'bottomleft',
+                maxWidth: 200
+            },
+            legend: {
+                position: 'bottomright',
+                style: 'modern',
+                layers: []
+            },
+            mapInfo: { 
+                position: 'topright',
+                style: 'professional',
+                title: '我的地图',
+                subtitle: '2024年度规划图'
+            },
+            graticule: {
+                interval: 1,
+                enabled: true
+            },
+            exportPreview: {
+                format: 'png',
+                quality: 1.0,
+                scale: 2
+            }
+        });
+        
+        // ========== 方式4：单独添加控件（最灵活）==========
         L.control.northArrow({ 
             position: 'topleft', 
             style: 'gis' 
@@ -111,44 +178,38 @@ npm run demo
             style: 'leaflet' 
         }).addTo(map);
         
-        L.control.legend({ 
-            position: 'bottomright', 
-            style: 'modern', 
-            layers: [] 
-        }).addTo(map);
+        // ========== 控制器 API 使用示例 ==========
         
-        L.control.graticule({ 
-            interval: 1 
-        }).addTo(map);
+        // 🆕 高频操作 - 使用统一的快捷方法（新增）
+        controller.setTitle('mapInfo', '我的地图');      // 设置标题
+        controller.setSubtitle('mapInfo', '副标题');     // 设置副标题
+        controller.setSize('northArrow', 100);          // 设置大小
+        controller.setWidth('scaleBar', 200);           // 设置宽度
+        controller.setLayers('legend', [...]);          // 设置图层
+        controller.addLayer('legend', {...});           // 添加图层
         
-        L.control.mapInfo({ 
-            position: 'topright', 
-            title: '我的地图',
-            subtitle: '基于 Leaflet GIS Elements'
-        }).addTo(map);
+        // 显示/隐藏控件
+        controller.show('legend');
+        controller.hide('legend');
+        controller.toggle('legend');
         
-        L.control.exportPreview({ 
-            position: 'topright' 
-        }).addTo(map);
+        // 切换样式
+        controller.setStyle('scaleBar', 'minimal');
         
-        // 或者方式2：使用控制器统一管理（推荐）
-        const controller = L.GISElements.createController(map, {
-            northArrow: { 
-                style: 'compass',
-                position: 'topleft'
-            },
-            scaleBar: { 
-                style: 'gis',
-                position: 'bottomleft'
-            },
-            mapInfo: { 
-                title: '我的地图',
-                subtitle: '2024年度规划图'
-            }
+        // 低频操作 - 通过 getControl() 访问
+        controller.getControl('graticule').setLineColor('#666');
+        controller.getControl('mapInfo').setFieldVisibility('title', true);
+        
+        // 快速导出地图
+        controller.exportMap({
+            includeControls: ['northArrow', 'scaleBar', 'mapInfo'],
+            format: 'png',
+            quality: 1.0,
+            scale: 2,
+            filename: 'my_map'
+        }).then(() => {
+            console.log('✓ 导出成功！');
         });
-        
-        // 通过控制器访问控件实例
-        // controller.getControl('northArrow').setStyle('leaflet');
     </script>
 </body>
 </html>
@@ -176,15 +237,51 @@ import 'leaflet-gis-elements/dist/leaflet-gis-elements.min.css';
 // 导入 JS（会自动扩展 L 对象）
 import 'leaflet-gis-elements';
 
-// 或者按需导入
-import { createController } from 'leaflet-gis-elements';
-
-// 创建地图并添加控件
+// 1. 创建地图
 const map = L.map('map').setView([39.9, 116.4], 10);
-L.control.northArrow({ style: 'gis' }).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+// 🆕 方式1：quickStart() - 最简单（1行代码）⭐⭐⭐
+const controller = L.GISElements.quickStart(map);
+// 或带自定义内容：
+const controller2 = L.GISElements.quickStart(map, {
+    preset: 'web',
+    title: '我的地图',
+    layers: [{ name: '数据', color: '#ff0000', type: 'polygon' }]
+});
+
+// 方式2：使用预设（推荐）⭐⭐
+const controller3 = L.GISElements.createController(map, 
+    L.GISElements.presets.web
+);
+
+// 方式3：自定义配置（灵活）⭐
+const controller4 = L.GISElements.createController(map, {
+    autoShow: true,
+    northArrow: { style: 'gis', size: 80 },
+    scaleBar: { style: 'leaflet' },
+    mapInfo: { title: '我的地图' }
+});
+
+// 🆕 使用统一的快捷方法
+controller.setTitle('mapInfo', '我的地图');
+controller.setSize('northArrow', 100);
+controller.setLayers('legend', [...]);
+
+// 快速导出地图
+controller.exportMap({
+    includeControls: ['northArrow', 'scaleBar'],
+    format: 'png',
+    quality: 1.0
+});
 ```
 
-> 💡 **完整交互式示例**：查看 [examples/index.html](examples/index.html)
+> 💡 **示例文件**：
+> - 🚀 [QuickStart 极简](examples/01-quickstart-minimal.html) - 1行代码（最推荐）
+> - 🎨 [QuickStart 自定义](examples/02-quickstart-custom.html) - 1行代码完成所有配置
+> - 🎯 [统一 API 示例](examples/03-unified-api.html) - 展示快捷方法
+> - 📦 [预设配置](examples/simple.html) - 使用预设配置
+> - 🎮 [完整交互](examples/index.html) - 包含UI控制面板
 
 ## 📚 使用文档
 

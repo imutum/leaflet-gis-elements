@@ -9,9 +9,7 @@
     function DemoApp() {
         this.map = null;
         this.controller = null;
-        this.exportPreview = null;
-        this.exporter = null;
-        this.uiController = null;
+        this.uiBindings = null;
     }
 
     /**
@@ -20,15 +18,15 @@
     DemoApp.prototype.init = function () {
         this.initMap();
         this.initControls();
-        this.initExport();
         this.initUI();
-        this.showAllControls();
 
-        console.log('Demo 应用已加载');
-        console.log('控制器:', this.controller);
+        console.log('✓ Demo 应用已加载');
+        console.log('✓ 地图控制器:', this.controller);
+        console.log('✓ 使用简化的UI绑定架构（统一调用MapController高级API）');
 
         // 暴露到全局以便调试
         window.demoApp = this;
+        window.controller = this.controller;
     };
 
     /**
@@ -53,10 +51,15 @@
      */
     DemoApp.prototype.initControls = function () {
         var config = window.DemoConfig;
-        var controls = config.controls;
 
+        // 使用统一的MapController管理所有控件（包括导出控件）
         this.controller = new L.GISElements.MapController(this.map, {
-            mapInfo: Object.assign({}, controls.mapInfo, {
+            autoShow: true, // 自动显示所有控件
+            mapInfo: {
+                position: config.controls.mapInfo.position,
+                style: config.controls.mapInfo.style,
+                draggable: config.controls.mapInfo.draggable,
+                // 空值字段，由用户填写
                 title: '',
                 subtitle: '',
                 author: '',
@@ -65,69 +68,24 @@
                 projection: 'WGS84 / EPSG:4326',
                 scale: '1:100000',
                 notes: ''
-            }),
-            northArrow: controls.northArrow,
-            scaleBar: controls.scaleBar,
-            legend: Object.assign({}, controls.legend, {
+            },
+            northArrow: config.controls.northArrow,
+            scaleBar: config.controls.scaleBar,
+            legend: Object.assign({}, config.controls.legend, {
                 layers: config.sampleLayers
             }),
-            graticule: controls.graticule
+            graticule: config.controls.graticule,
+            exportPreview: config.export // 导出控件配置
         });
     };
 
     /**
-     * 初始化导出功能
-     */
-    DemoApp.prototype.initExport = function () {
-        var config = window.DemoConfig.export;
-
-        // 创建导出预览控件
-        this.exportPreview = new L.Control.ExportPreview({
-            position: 'topright',
-            format: config.format,
-            quality: config.quality,
-            filename: config.filename,
-            scale: config.scale,
-            autoCalculateBounds: config.autoCalculateBounds
-        });
-
-        var exportControl = this.exportPreview.createControl();
-        exportControl.addTo(this.map);
-
-        // 获取底层的 MapExporter 实例
-        this.exporter = exportControl.options.control.exporter;
-
-        // 设置初始值
-        if (this.exporter) {
-            this.exporter.setScale(config.scale);
-            this.exporter.setQuality(config.quality);
-            this.exporter.setFilename(config.filename);
-        }
-
-        // 暴露到全局
-        window.controller = this.controller;
-        window.exportPreview = this.exportPreview;
-        window.exporter = this.exporter;
-    };
-
-    /**
-     * 初始化UI控制器
+     * 初始化UI绑定（直接调用MapController高级API）
      */
     DemoApp.prototype.initUI = function () {
-        var exportControl = this.exportPreview.createControl();
-        this.uiController = new window.UIController(this.controller, exportControl, this.exporter);
-        this.uiController.init();
-    };
-
-    /**
-     * 显示所有控件
-     */
-    DemoApp.prototype.showAllControls = function () {
-        this.controller.show('mapInfo');
-        this.controller.show('northArrow');
-        this.controller.show('scaleBar');
-        this.controller.show('legend');
-        this.controller.show('graticule');
+        // 使用统一的UIBindings，所有功能都通过MapController高级API实现
+        this.uiBindings = new window.UIBindings(this.controller);
+        this.uiBindings.init();
     };
 
     // 全局函数：切换控制面板
