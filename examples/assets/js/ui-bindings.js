@@ -1,67 +1,141 @@
 /**
  * UI绑定模块
  * 统一管理所有UI事件绑定，直接调用MapController高级API
- * 
- * 替代原有的：
- * - ui-controller.js (协调器)
- * - ui-controllers/style-controller.js
- * - ui-controllers/visibility-controller.js
- * - ui-controllers/mapinfo-controller.js
- * - ui-controllers/graticule-controller.js
- * - ui-controllers/export-controller.js
+ *
+ * 按照“UI创建 / UI交互 / UI绑定前端功能逻辑”拆分职责
  */
 
 (function (window) {
     'use strict';
 
     /**
-     * UI绑定器
-     * @param {MapController} controller - 地图控制器
+     * UI 创建工具：负责生成或更新 UI 所需的 DOM 状态
      */
-    function UIBindings(controller) {
-        this.controller = controller;
-        this.exporter = controller.getExporter();
+    function UIBuilder() {
+        this.defaultQuality = 1;
     }
 
-    /**
-     * 初始化所有UI绑定
-     */
-    UIBindings.prototype.init = function () {
-        this.syncInitialState();
-        this.bindStyleControls();
-        this.bindVisibilityControls();
-        this.bindMapInfoControls();
-        this.bindGraticuleControls();
-        this.bindExportControls();
+    UIBuilder.prototype.setSectionVisibility = function (sectionId, visible) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.style.display = visible ? 'block' : 'none';
+        }
+    };
 
-        console.log('✓ UI绑定完成 - 使用MapController高级API');
+    UIBuilder.prototype.setToggleIndicator = function (toggleId, expanded) {
+        const toggle = document.getElementById(toggleId);
+        if (toggle) {
+            toggle.textContent = expanded ? '▼' : '▶';
+        }
+    };
+
+    UIBuilder.prototype.setText = function (elementId, text) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = text;
+        }
+    };
+
+    UIBuilder.prototype.populateStyleSelect = function (selectId, controlType, controller) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        const styles = L.GISElements.StyleRegistry.list(this.toKebab(controlType));
+        select.innerHTML = '';
+
+        styles.forEach(function (styleObj) {
+            const option = document.createElement('option');
+            option.value = styleObj.id;
+            option.textContent = styleObj.name;
+            select.appendChild(option);
+        });
+
+        const control = controller.getControl(controlType) || controller.controls[controlType];
+        const currentStyle = UIBuilder.resolveStyle(control);
+
+        if (currentStyle && styles.some(function (styleObj) { return styleObj.id === currentStyle; })) {
+            select.value = currentStyle;
+        }
+    };
+
+    UIBuilder.resolveStyle = function (control) {
+        if (!control) return null;
+        if (typeof control.getCurrentStyle === 'function') return control.getCurrentStyle();
+        if (typeof control.getStyle === 'function') return control.getStyle();
+        return control.currentStyle || null;
+    };
+
+    UIBuilder.prototype.toKebab = function (str) {
+        return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+    };
+
+    UIBuilder.prototype.updateQualityRecommendation = function (quality) {
+        const rec = document.getElementById('qualityRecommendation');
+        if (!rec) return;
+
+        let text;
+        let bgColor;
+
+        if (quality >= 0.9) {
+            text = '⭐ 当前：最高质量 - 适合印刷和正式出版';
+            bgColor = '#e3f2fd';
+        } else if (quality >= 0.7) {
+            text = '👍 当前：高质量 - 适合网页展示和普通用途';
+            bgColor = '#e8f5e9';
+        } else if (quality >= 0.5) {
+            text = '⚠️ 当前：中等质量 - 适合快速预览';
+            bgColor = '#fff3e0';
+        } else {
+            text = '⚠️ 当前：低质量 - 仅用于草图，可能模糊';
+            bgColor = '#ffebee';
+        }
+
+        rec.textContent = text;
+        rec.style.background = bgColor;
     };
 
     /**
-     * 同步初始UI状态，使其与控制器当前配置保持一致
+     * 初始状态同步：负责将控制器状态同步到 UI
      */
-    UIBindings.prototype.syncInitialState = function () {
+    function UIStateSynchronizer(controller, exporter, builder) {
+        this.controller = controller;
+        this.exporter = exporter;
+        this.builder = builder;
+    }
+
+    UIStateSynchronizer.prototype.sync = function () {
         this.applyVisibilityDefaults();
         this.applyControlDefaults();
         this.applyExportDefaults();
     };
 
-    /**
-     * 应用控件显隐的默认状态
-     */
-    UIBindings.prototype.applyVisibilityDefaults = function () {
+    UIStateSynchronizer.prototype.applyVisibilityDefaults = function () {
         const visibility = this.controller.visibility || {};
-        this.setVisibilityDefaults('northArrow', visibility.northArrow, 'showNorthArrow', 'northArrowSection', 'northArrowToggle');
-        this.setVisibilityDefaults('scaleBar', visibility.scaleBar, 'showScaleBar', 'scaleBarSection', 'scaleBarToggle');
-        this.setVisibilityDefaults('legend', visibility.legend, 'showLegend', 'legendSection', 'legendToggle');
-        this.setVisibilityDefaults('graticule', visibility.graticule, 'showGraticule', 'graticuleSection', 'graticuleToggle');
-        this.setVisibilityDefaults('mapInfo', visibility.mapInfo, 'showMapInfo', 'mapInfoSection', 'mapInfoToggle');
+        this.setVisibility('northArrow', visibility.northArrow, 'showNorthArrow', 'northArrowSection', 'northArrowToggle');
+        this.setVisibility('scaleBar', visibility.scaleBar, 'showScaleBar', 'scaleBarSection', 'scaleBarToggle');
+        this.setVisibility('legend', visibility.legend, 'showLegend', 'legendSection', 'legendToggle');
+        this.setVisibility('graticule', visibility.graticule, 'showGraticule', 'graticuleSection', 'graticuleToggle');
+        this.setVisibility('mapInfo', visibility.mapInfo, 'showMapInfo', 'mapInfoSection', 'mapInfoToggle');
     };
 
-    /**
-     * 根据控制器数据设置具体控件的默认值
-     */
-    UIBindings.prototype.applyControlDefaults = function () {
+    UIStateSynchronizer.prototype.setVisibility = function (controlName, visible, checkboxId, sectionId, toggleId) {
+        const isVisible = visible !== false;
+
+        if (checkboxId) {
+            FormBinder.setChecked(checkboxId, isVisible);
+        }
+        if (sectionId) {
+            this.builder.setSectionVisibility(sectionId, isVisible);
+        }
+        if (toggleId) {
+            this.builder.setToggleIndicator(toggleId, isVisible);
+        }
+        if (!isVisible) {
+            this.controller.hide(controlName);
+        }
+    };
+
+    UIStateSynchronizer.prototype.applyControlDefaults = function () {
         const northArrow = this.controller.getControl('northArrow');
         const scaleBar = this.controller.getControl('scaleBar');
         const legend = this.controller.getControl('legend');
@@ -88,7 +162,6 @@
             if (typeof maxWidth === 'number' && !Number.isNaN(maxWidth)) {
                 FormBinder.setValue('legendWidth', maxWidth);
             }
-
             if (typeof maxHeight === 'number' && !Number.isNaN(maxHeight)) {
                 FormBinder.setValue('legendHeight', maxHeight);
             }
@@ -123,7 +196,7 @@
                     notes: 'showFieldNotes'
                 };
 
-                Object.keys(showFieldMap).forEach(field => {
+                Object.keys(showFieldMap).forEach(function (field) {
                     if (showConfig[field] !== undefined) {
                         FormBinder.setChecked(showFieldMap[field], !!showConfig[field]);
                     }
@@ -132,10 +205,7 @@
         }
     };
 
-    /**
-     * 同步导出控件的默认值
-     */
-    UIBindings.prototype.applyExportDefaults = function () {
+    UIStateSynchronizer.prototype.applyExportDefaults = function () {
         const exportControl = this.controller.getControl('exportPreview');
         const exporterConfig = this.exporter && typeof this.exporter.getConfig === 'function'
             ? this.exporter.getConfig()
@@ -145,24 +215,17 @@
             if (exporterConfig.format) {
                 FormBinder.setValue('exportFormat', exporterConfig.format);
             }
-
             if (exporterConfig.scale !== undefined) {
                 FormBinder.setValue('exportScale', String(exporterConfig.scale));
             }
-
             if (exporterConfig.quality !== undefined) {
                 FormBinder.setValue('exportQuality', exporterConfig.quality);
-                const qualityValueLabel = document.getElementById('qualityValue');
-                if (qualityValueLabel) {
-                    qualityValueLabel.textContent = String(exporterConfig.quality);
-                }
-                this.updateQualityRecommendation(exporterConfig.quality);
+                this.builder.setText('qualityValue', String(exporterConfig.quality));
+                this.builder.updateQualityRecommendation(exporterConfig.quality);
             }
-
             if (exporterConfig.filename) {
                 FormBinder.setValue('exportFilename', exporterConfig.filename);
             }
-
             if (exporterConfig.includeBasemap !== undefined) {
                 FormBinder.setChecked('exportIncludeBasemap', exporterConfig.includeBasemap);
             }
@@ -195,184 +258,97 @@
     };
 
     /**
-     * 设置控件的显示状态及对应的UI
-     * @param {string} controlName
-     * @param {boolean} visible
-     * @param {string} checkboxId
-     * @param {string} sectionId
-     * @param {string} toggleId
+     * UI 交互与事件绑定
      */
-    UIBindings.prototype.setVisibilityDefaults = function (controlName, visible, checkboxId, sectionId, toggleId) {
-        const isVisible = visible !== false;
-        if (checkboxId) {
-            FormBinder.setChecked(checkboxId, isVisible);
-        }
+    function UIInteractionBinder(controller, exporter, builder) {
+        this.controller = controller;
+        this.exporter = exporter;
+        this.builder = builder;
+    }
 
-        const section = sectionId ? document.getElementById(sectionId) : null;
-        if (section) {
-            section.style.display = isVisible ? 'block' : 'none';
-        }
-
-        const toggle = toggleId ? document.getElementById(toggleId) : null;
-        if (toggle) {
-            toggle.textContent = isVisible ? '▼' : '▶';
-        }
-
-        if (!isVisible) {
-            this.controller.hide(controlName);
-        }
+    UIInteractionBinder.prototype.prepareUI = function () {
+        this.builder.populateStyleSelect('northArrowStyle', 'northArrow', this.controller);
+        this.builder.populateStyleSelect('scaleBarStyle', 'scaleBar', this.controller);
+        this.builder.populateStyleSelect('legendStyle', 'legend', this.controller);
+        this.builder.populateStyleSelect('mapInfoStyle', 'mapInfo', this.controller);
     };
 
-    // ==================== 1. 样式控制 ====================
+    UIInteractionBinder.prototype.bindEvents = function () {
+        this.bindStyleControls();
+        this.bindVisibilityControls();
+        this.bindMapInfoControls();
+        this.bindGraticuleControls();
+        this.bindExportControls();
+    };
 
-    /**
-     * 绑定所有样式切换控件
-     */
-    UIBindings.prototype.bindStyleControls = function () {
-        const self = this;
+    UIInteractionBinder.prototype.bindStyleControls = function () {
+        const controller = this.controller;
 
-        // 填充样式选择框
-        this.populateStyleSelect('northArrowStyle', 'northArrow');
-        this.populateStyleSelect('scaleBarStyle', 'scaleBar');
-        this.populateStyleSelect('legendStyle', 'legend');
-        this.populateStyleSelect('mapInfoStyle', 'mapInfo');
-
-        // 绑定样式切换事件（使用高级API：controller.setStyle）
         FormBinder.bindSelect('northArrowStyle', function (styleName) {
-            self.controller.setStyle('northArrow', styleName);
+            controller.setStyle('northArrow', styleName);
         });
-
         FormBinder.bindSelect('scaleBarStyle', function (styleName) {
-            self.controller.setStyle('scaleBar', styleName);
+            controller.setStyle('scaleBar', styleName);
         });
-
         FormBinder.bindSelect('legendStyle', function (styleName) {
-            self.controller.setStyle('legend', styleName);
+            controller.setStyle('legend', styleName);
         });
-
         FormBinder.bindSelect('mapInfoStyle', function (styleName) {
-            self.controller.setStyle('mapInfo', styleName);
+            controller.setStyle('mapInfo', styleName);
         });
     };
 
-    /**
-     * 将驼峰格式转换为连字符格式
-     * 例如：'northArrow' -> 'north-arrow'
-     */
-    UIBindings.prototype.camelToKebab = function (str) {
-        return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-    };
+    UIInteractionBinder.prototype.bindVisibilityControls = function () {
+        const controller = this.controller;
+        const builder = this.builder;
 
-    /**
-     * 填充样式选择框
-     */
-    UIBindings.prototype.populateStyleSelect = function (selectId, controlType) {
-        const select = document.getElementById(selectId);
-        if (!select) return;
-
-        // 将驼峰格式转换为连字符格式（样式注册时使用的格式）
-        const kebabControlType = this.camelToKebab(controlType);
-        const styles = L.GISElements.StyleRegistry.list(kebabControlType);
-        select.innerHTML = '';
-
-        styles.forEach(function (styleObj) {
-            const option = document.createElement('option');
-            option.value = styleObj.id;
-            option.textContent = styleObj.name;
-            select.appendChild(option);
-        });
-
-        // 设置当前样式为选中
-        const control = this.controller.getControl(controlType) || this.controller.controls[controlType];
-        let currentStyle = null;
-
-        if (control) {
-            if (typeof control.getCurrentStyle === 'function') {
-                currentStyle = control.getCurrentStyle();
-            } else if (typeof control.getStyle === 'function') {
-                currentStyle = control.getStyle();
-            } else if (control.currentStyle) {
-                currentStyle = control.currentStyle;
-            }
-        }
-
-        if (currentStyle && styles.some(function (styleObj) { return styleObj.id === currentStyle; })) {
-            select.value = currentStyle;
-        }
-    };
-
-    // ==================== 2. 显示/隐藏控制 ====================
-
-    /**
-     * 绑定显示/隐藏控件
-     */
-    UIBindings.prototype.bindVisibilityControls = function () {
-        const self = this;
-
-        // 控件显隐切换（使用高级API：show/hide）
         FormBinder.bindCheckbox('showNorthArrow', function (checked) {
-            checked ? self.controller.show('northArrow') : self.controller.hide('northArrow');
-            self.toggleSection('northArrowSection', checked);
+            checked ? controller.show('northArrow') : controller.hide('northArrow');
+            builder.setSectionVisibility('northArrowSection', checked);
+            builder.setToggleIndicator('northArrowToggle', checked);
         });
 
         FormBinder.bindCheckbox('showScaleBar', function (checked) {
-            checked ? self.controller.show('scaleBar') : self.controller.hide('scaleBar');
-            self.toggleSection('scaleBarSection', checked);
+            checked ? controller.show('scaleBar') : controller.hide('scaleBar');
+            builder.setSectionVisibility('scaleBarSection', checked);
+            builder.setToggleIndicator('scaleBarToggle', checked);
         });
 
         FormBinder.bindCheckbox('showLegend', function (checked) {
-            checked ? self.controller.show('legend') : self.controller.hide('legend');
-            self.toggleSection('legendSection', checked);
+            checked ? controller.show('legend') : controller.hide('legend');
+            builder.setSectionVisibility('legendSection', checked);
+            builder.setToggleIndicator('legendToggle', checked);
         });
 
         FormBinder.bindCheckbox('showGraticule', function (checked) {
-            checked ? self.controller.show('graticule') : self.controller.hide('graticule');
-            self.toggleSection('graticuleSection', checked);
+            checked ? controller.show('graticule') : controller.hide('graticule');
+            builder.setSectionVisibility('graticuleSection', checked);
+            builder.setToggleIndicator('graticuleToggle', checked);
         });
 
         FormBinder.bindCheckbox('showMapInfo', function (checked) {
-            checked ? self.controller.show('mapInfo') : self.controller.hide('mapInfo');
-            self.toggleSection('mapInfoSection', checked);
+            checked ? controller.show('mapInfo') : controller.hide('mapInfo');
+            builder.setSectionVisibility('mapInfoSection', checked);
+            builder.setToggleIndicator('mapInfoToggle', checked);
         });
 
-        // 尺寸调整（使用高级API：getControl）
         FormBinder.bindNumberInput('northArrowSize', function (value) {
-            self.controller.getControl('northArrow').setSize(value);
+            controller.getControl('northArrow').setSize(value);
         });
-
         FormBinder.bindNumberInput('scaleBarWidth', function (value) {
-            self.controller.getControl('scaleBar').setMaxWidth(value);
+            controller.getControl('scaleBar').setMaxWidth(value);
         });
-
         FormBinder.bindNumberInput('legendWidth', function (value) {
-            self.controller.getControl('legend').setMaxWidth(value);
+            controller.getControl('legend').setMaxWidth(value);
         });
-
         FormBinder.bindNumberInput('legendHeight', function (value) {
-            self.controller.getControl('legend').setMaxHeight(value);
+            controller.getControl('legend').setMaxHeight(value);
         });
     };
 
-    /**
-     * 切换区域显示
-     */
-    UIBindings.prototype.toggleSection = function (sectionId, show) {
-        const section = document.getElementById(sectionId);
-        if (section) {
-            section.style.display = show ? 'block' : 'none';
-        }
-    };
-
-    // ==================== 3. 地图注记控制 ====================
-
-    /**
-     * 绑定地图注记控件
-     */
-    UIBindings.prototype.bindMapInfoControls = function () {
-        const self = this;
+    UIInteractionBinder.prototype.bindMapInfoControls = function () {
         const mapInfoControl = this.controller.getControl('mapInfo');
 
-        // 绑定字段输入（使用高级API：getControl）
         FormBinder.bindInput('mapTitle', mapInfoControl, 'setTitle');
         FormBinder.bindInput('mapSubtitle', mapInfoControl, 'setSubtitle');
         FormBinder.bindInput('mapAuthor', mapInfoControl, 'setAuthor');
@@ -383,17 +359,16 @@
         FormBinder.bindInput('mapScaleText', mapInfoControl, 'setScale');
         FormBinder.bindInput('mapNotes', mapInfoControl, 'setNotes');
 
-        // 字段显示控制
         const fieldCheckboxes = {
-            'showFieldTitle': 'title',
-            'showFieldSubtitle': 'subtitle',
-            'showFieldAuthor': 'author',
-            'showFieldOrganization': 'organization',
-            'showFieldDate': 'date',
-            'showFieldDataSource': 'dataSource',
-            'showFieldProjection': 'projection',
-            'showFieldScale': 'scale',
-            'showFieldNotes': 'notes'
+            showFieldTitle: 'title',
+            showFieldSubtitle: 'subtitle',
+            showFieldAuthor: 'author',
+            showFieldOrganization: 'organization',
+            showFieldDate: 'date',
+            showFieldDataSource: 'dataSource',
+            showFieldProjection: 'projection',
+            showFieldScale: 'scale',
+            showFieldNotes: 'notes'
         };
 
         Object.keys(fieldCheckboxes).forEach(function (checkboxId) {
@@ -404,30 +379,20 @@
         });
     };
 
-    // ==================== 4. 经纬网控制 ====================
-
-    /**
-     * 绑定经纬网控件
-     */
-    UIBindings.prototype.bindGraticuleControls = function () {
-        const self = this;
+    UIInteractionBinder.prototype.bindGraticuleControls = function () {
         const graticuleControl = this.controller.getControl('graticule');
 
-        // 经纬线显示控制
         FormBinder.bindCheckbox('showGraticuleLines', function (checked) {
             graticuleControl.setLinesVisible(checked);
         });
-
-        // 边框显示控制
         FormBinder.bindCheckbox('showGraticuleFrame', function (checked) {
             graticuleControl.setFrameVisible(checked);
         });
 
-        // 间隔设置
         const intervalSelect = document.getElementById('graticuleInterval');
         if (intervalSelect) {
-            intervalSelect.addEventListener('change', function (e) {
-                const value = e.target.value;
+            intervalSelect.addEventListener('change', function (event) {
+                const value = event.target.value;
                 if (value === 'auto') {
                     graticuleControl.setInterval(null);
                 } else {
@@ -436,7 +401,6 @@
             });
         }
 
-        // 经纬线样式
         FormBinder.bindInput('graticuleLineColor', function (value) {
             const textInput = document.getElementById('graticuleLineColorText');
             if (textInput) textInput.value = value;
@@ -445,26 +409,21 @@
 
         FormBinder.bindRange('graticuleLineWeight', 'graticuleLineWeightValue',
             function (value) { return value + 'px'; },
-            function (value) {
-                graticuleControl.setLineWeight(parseFloat(value));
-            }
+            function (value) { graticuleControl.setLineWeight(parseFloat(value)); }
         );
 
         FormBinder.bindRange('graticuleLineOpacity', 'graticuleLineOpacityValue',
             function (value) { return value; },
-            function (value) {
-                graticuleControl.setLineOpacity(parseFloat(value));
-            }
+            function (value) { graticuleControl.setLineOpacity(parseFloat(value)); }
         );
 
         const lineStyleSelect = document.getElementById('graticuleLineStyle');
         if (lineStyleSelect) {
-            lineStyleSelect.addEventListener('change', function (e) {
-                graticuleControl.setLineDashArray(e.target.value);
+            lineStyleSelect.addEventListener('change', function (event) {
+                graticuleControl.setLineDashArray(event.target.value);
             });
         }
 
-        // 标注位置控制
         const labelPositions = ['labelTop', 'labelBottom', 'labelLeft', 'labelRight'];
         labelPositions.forEach(function (posId) {
             FormBinder.bindCheckbox(posId, function (checked) {
@@ -474,81 +433,85 @@
         });
     };
 
-    // ==================== 5. 导出控制 ====================
-
-    /**
-     * 绑定导出控件
-     */
-    UIBindings.prototype.bindExportControls = function () {
+    UIInteractionBinder.prototype.bindExportControls = function () {
+        const controller = this.controller;
+        const exporter = this.exporter;
+        const builder = this.builder;
         const self = this;
-        const exportControl = this.controller.getControl('exportPreview');
+        const exportControl = controller.getControl('exportPreview');
 
-        // 导出按钮
         FormBinder.bindButton('exportMapButton', function () {
             self.handleExport();
         });
 
-        // 预览按钮
         FormBinder.bindButton('previewExportButton', function () {
             self.handlePreview();
         });
 
-        // 导出范围选择
         FormBinder.bindSelect('exportRange', function (value) {
             const modeMapping = {
-                'graticule': 'graticule',
-                'viewport': 'viewport',
-                'auto': 'all'
+                graticule: 'graticule',
+                viewport: 'viewport',
+                auto: 'all'
             };
             exportControl.setBoundsMode(modeMapping[value]);
         });
 
-        // 格式选择
         FormBinder.bindSelect('exportFormat', function (value) {
             exportControl.setFormat(value);
         });
 
-        // 分辨率倍数
         FormBinder.bindSelect('exportScale', function (value) {
-            self.exporter.setScale(parseInt(value));
+            exporter.setScale(parseInt(value, 10));
         });
 
-        // 质量调整
         const qualityInput = document.getElementById('exportQuality');
         if (qualityInput) {
-            qualityInput.addEventListener('input', function (e) {
-                const quality = parseFloat(e.target.value);
-                self.exporter.setQuality(quality);
-                self.updateQualityRecommendation(quality);
+            qualityInput.addEventListener('input', function (event) {
+                const quality = parseFloat(event.target.value);
+                exporter.setQuality(quality);
+                builder.setText('qualityValue', String(quality));
+                builder.updateQualityRecommendation(quality);
             });
         }
 
-        // 初始化质量推荐
-        this.updateQualityRecommendation(1.0);
+        const initialQuality = parseFloat(FormBinder.getValue('exportQuality', builder.defaultQuality));
+        builder.setText('qualityValue', String(initialQuality));
+        builder.updateQualityRecommendation(initialQuality);
     };
 
-    /**
-     * 处理导出（使用高级API：controller.exportMap）
-     */
-    UIBindings.prototype.handleExport = function () {
-        const options = this.collectExportOptions();
+    UIInteractionBinder.prototype.collectExportOptions = function () {
+        return {
+            includeBasemap: FormBinder.getChecked('exportIncludeBasemap', true),
+            includeMapInfo: FormBinder.getChecked('exportIncludeMapInfo', true),
+            includeGraticule: FormBinder.getChecked('exportIncludeGraticule', true),
+            includeLegend: FormBinder.getChecked('exportIncludeLegend', true),
+            includeScaleBar: FormBinder.getChecked('exportIncludeScaleBar', true),
+            includeNorthArrow: FormBinder.getChecked('exportIncludeNorthArrow', true),
+            format: FormBinder.getValue('exportFormat', 'png'),
+            quality: parseFloat(FormBinder.getValue('exportQuality', 1.0)),
+            scale: parseInt(FormBinder.getValue('exportScale', 2), 10),
+            filename: FormBinder.getValue('exportFilename', 'map')
+        };
+    };
 
-        // 构建控件列表
+    UIInteractionBinder.prototype.handleExport = function () {
+        const options = this.collectExportOptions();
         const includeControls = [];
+
         if (options.includeMapInfo) includeControls.push('mapInfo');
         if (options.includeNorthArrow) includeControls.push('northArrow');
         if (options.includeScaleBar) includeControls.push('scaleBar');
         if (options.includeLegend) includeControls.push('legend');
         if (options.includeGraticule) includeControls.push('graticule');
 
-        // 🎯 使用MapController的高级API：exportMap()
         this.controller.exportMap({
             includeControls: includeControls,
             includeBasemap: options.includeBasemap,
             format: options.format,
-            quality: parseFloat(FormBinder.getValue('exportQuality', 1.0)),
-            scale: parseInt(FormBinder.getValue('exportScale', 2)),
-            filename: FormBinder.getValue('exportFilename', 'map')
+            quality: options.quality,
+            scale: options.scale,
+            filename: options.filename
         }).then(function () {
             console.log('✓ 地图导出成功');
         }).catch(function (error) {
@@ -557,59 +520,31 @@
         });
     };
 
-    /**
-     * 处理预览
-     */
-    UIBindings.prototype.handlePreview = function () {
+    UIInteractionBinder.prototype.handlePreview = function () {
         const exportControl = this.controller.getControl('exportPreview');
         exportControl.recalculateBounds();
         exportControl.togglePreview();
     };
 
     /**
-     * 收集导出选项
+     * UI 绑定入口
      */
-    UIBindings.prototype.collectExportOptions = function () {
-        return {
-            range: FormBinder.getValue('exportRange', 'graticule'),
-            includeBasemap: FormBinder.getChecked('exportIncludeBasemap', true),
-            includeMapInfo: FormBinder.getChecked('exportIncludeMapInfo', true),
-            includeGraticule: FormBinder.getChecked('exportIncludeGraticule', true),
-            includeLegend: FormBinder.getChecked('exportIncludeLegend', true),
-            includeScaleBar: FormBinder.getChecked('exportIncludeScaleBar', true),
-            includeNorthArrow: FormBinder.getChecked('exportIncludeNorthArrow', true),
-            format: FormBinder.getValue('exportFormat', 'png')
-        };
+    function UIBindings(controller) {
+        this.controller = controller;
+        this.exporter = controller.getExporter();
+        this.builder = new UIBuilder();
+        this.stateSynchronizer = new UIStateSynchronizer(controller, this.exporter, this.builder);
+        this.interactions = new UIInteractionBinder(controller, this.exporter, this.builder);
+    }
+
+    UIBindings.prototype.init = function () {
+        this.interactions.prepareUI();
+        this.stateSynchronizer.sync();
+        this.interactions.bindEvents();
+
+        console.log('✓ UI绑定完成 - 模块化构建/交互/绑定已就绪');
     };
 
-    /**
-     * 更新质量推荐显示
-     */
-    UIBindings.prototype.updateQualityRecommendation = function (quality) {
-        const rec = document.getElementById('qualityRecommendation');
-        if (!rec) return;
-
-        let text, bgColor;
-
-        if (quality >= 0.9) {
-            text = '⭐ 当前：最高质量 - 适合印刷和正式出版';
-            bgColor = '#e3f2fd';
-        } else if (quality >= 0.7) {
-            text = '👍 当前：高质量 - 适合网页展示和普通用途';
-            bgColor = '#e8f5e9';
-        } else if (quality >= 0.5) {
-            text = '⚠️ 当前：中等质量 - 适合快速预览';
-            bgColor = '#fff3e0';
-        } else {
-            text = '⚠️ 当前：低质量 - 仅用于草图，可能模糊';
-            bgColor = '#ffebee';
-        }
-
-        rec.textContent = text;
-        rec.style.background = bgColor;
-    };
-
-    // 暴露到全局
     window.UIBindings = UIBindings;
 
 })(window);

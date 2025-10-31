@@ -1,65 +1,39 @@
 /**
  * Demo 页面主脚本
- * 初始化地图和所有控件
+ * 初始化地图与示例功能
+ *
+ * 结构按照“配置 -> UI 创建 -> UI 交互 -> 前端功能逻辑”拆分
  */
 
 (function (window) {
     'use strict';
 
-    function DemoApp() {
-        this.map = null;
-        this.controller = null;
-        this.uiBindings = null;
+    // ==================== 前端配置 ====================
+
+    function getDemoConfig() {
+        return window.DemoConfig;
     }
 
-    /**
-     * 初始化应用
-     */
-    DemoApp.prototype.init = function () {
-        this.initMap();
-        this.initControls();
-        this.initUI();
+    // ==================== 前端 UI 创建 ====================
 
-        console.log('✓ Demo 应用已加载');
-        console.log('✓ 地图控制器:', this.controller);
-        console.log('✓ 使用简化的UI绑定架构（统一调用MapController高级API）');
+    function createMap(config) {
+        const map = L.map('map').setView(config.map.center, config.map.zoom);
 
-        // 暴露到全局以便调试
-        window.demoApp = this;
-        window.controller = this.controller;
-    };
-
-    /**
-     * 初始化地图
-     */
-    DemoApp.prototype.initMap = function () {
-        var config = window.DemoConfig;
-        var center = config.map.center;
-        var zoom = config.map.zoom;
-
-        this.map = L.map('map').setView(center, zoom);
-
-        // 添加底图
         L.tileLayer(config.basemap.url, {
             attribution: config.basemap.attribution,
             maxZoom: config.map.maxZoom
-        }).addTo(this.map);
-    };
+        }).addTo(map);
 
-    /**
-     * 初始化控件
-     */
-    DemoApp.prototype.initControls = function () {
-        var config = window.DemoConfig;
+        return map;
+    }
 
-        // 使用统一的MapController管理所有控件（包括导出控件）
-        this.controller = new L.GISElements.MapController(this.map, {
-            autoShow: true, // 自动显示所有控件
+    function createController(map, config) {
+        return new L.GISElements.MapController(map, {
+            autoShow: true,
             mapInfo: {
                 position: config.controls.mapInfo.position,
                 style: config.controls.mapInfo.style,
                 draggable: config.controls.mapInfo.draggable,
-                // 空值字段，由用户填写
                 title: '',
                 subtitle: '',
                 author: '',
@@ -75,46 +49,65 @@
                 layers: config.sampleLayers
             }),
             graticule: config.controls.graticule,
-            exportPreview: config.export // 导出控件配置
+            exportPreview: config.export
         });
+    }
+
+    function createUIBindings(controller) {
+        const bindings = new window.UIBindings(controller);
+        bindings.init();
+        return bindings;
+    }
+
+    // ==================== 前端功能代码逻辑 ====================
+
+    function DemoApp() {
+        this.map = null;
+        this.controller = null;
+        this.uiBindings = null;
+    }
+
+    DemoApp.prototype.init = function () {
+        const config = getDemoConfig();
+
+        this.map = createMap(config);
+        this.controller = createController(this.map, config);
+        this.uiBindings = createUIBindings(this.controller);
+
+        this.exposeForDebug();
+
+        console.log('✓ Demo 应用已加载');
+        console.log('✓ 地图控制器:', this.controller);
     };
 
-    /**
-     * 初始化UI绑定（直接调用MapController高级API）
-     */
-    DemoApp.prototype.initUI = function () {
-        // 使用统一的UIBindings，所有功能都通过MapController高级API实现
-        this.uiBindings = new window.UIBindings(this.controller);
-        this.uiBindings.init();
+    DemoApp.prototype.exposeForDebug = function () {
+        window.demoApp = this;
+        window.controller = this.controller;
     };
 
-    // 全局函数：切换控制面板
+    // ==================== 前端 UI 交互 ====================
+
     window.togglePanel = function () {
-        var panel = document.getElementById('controlPanel');
+        const panel = document.getElementById('controlPanel');
         if (panel) {
             panel.classList.toggle('panel-hidden');
         }
     };
 
-    // 全局函数：切换区域折叠
     window.toggleSection = function (sectionId) {
-        var section = document.getElementById(sectionId);
-        var toggle = document.getElementById(sectionId.replace('Section', 'Toggle'));
+        const section = document.getElementById(sectionId);
+        const toggle = document.getElementById(sectionId.replace('Section', 'Toggle'));
 
         if (section && toggle) {
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                toggle.textContent = '▼';
-            } else {
-                section.style.display = 'none';
-                toggle.textContent = '▶';
-            }
+            const isHidden = section.style.display === 'none';
+            section.style.display = isHidden ? 'block' : 'none';
+            toggle.textContent = isHidden ? '▼' : '▶';
         }
     };
 
-    // DOM 加载完成后初始化
+    // ==================== 启动入口 ====================
+
     function initDemo() {
-        // 检查依赖是否加载
         if (typeof L === 'undefined') {
             console.error('Leaflet 库未加载');
             return;
@@ -128,15 +121,13 @@
             return;
         }
 
-        var app = new DemoApp();
+        const app = new DemoApp();
         app.init();
     }
 
-    // 使用多种方式确保 DOM 加载完成
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initDemo);
     } else {
-        // DOM 已经加载完成
         initDemo();
     }
 

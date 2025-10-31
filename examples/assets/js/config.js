@@ -6,22 +6,20 @@
 (function (window) {
     'use strict';
 
-    window.DemoConfig = {
-        // 地图初始配置
+    /**
+     * 前端配置：集中管理地图、图层、控件、导出等默认参数
+     */
+    const DemoConfig = Object.freeze({
         map: {
-            center: [39.9042, 116.4074], // 北京
+            center: [39.9042, 116.4074],
             zoom: 10,
             maxZoom: 18
         },
-
-        // 底图配置
         basemap: {
             url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         },
-
-        // 示例图层数据
-        sampleLayers: [
+        sampleLayers: Object.freeze([
             {
                 name: '温度分布',
                 type: 'gradient',
@@ -51,9 +49,7 @@
                 color: '#45b7d1',
                 type: 'point'
             }
-        ],
-
-        // 控件初始配置
+        ]),
         controls: {
             mapInfo: {
                 position: 'topleft',
@@ -85,15 +81,15 @@
                 draggable: true
             }
         },
-
-        // 导出默认配置
         export: {
             format: 'png',
-            quality: 1.0,
+            quality: 1,
             filename: 'thematic_map',
             scale: 2,
             autoCalculateBounds: true
         }
-    };
+    });
+
+    window.DemoConfig = DemoConfig;
 
 })(window);
