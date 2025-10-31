@@ -7,7 +7,7 @@
 
 // ==================== 导入 CSS ====================
 // 只导入控件样式，不包含会污染其他项目的全局样式
-import './css/controls.css';
+import './css/entries/leaflet-gis-elements.css';
 
 // ==================== 1. 常量配置 ====================
 import './js/constants.js';

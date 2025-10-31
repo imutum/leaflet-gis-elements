@@ -6,7 +6,8 @@
 
 ```
 css/
-├── controls.css              # 主入口文件，按顺序导入所有样式
+├── entries/                  # 样式入口集合
+│   └── leaflet-gis-elements.css  # 库样式主入口
 ├── base/                     # 基础层
 │   ├── variables.css         # CSS 变量定义（颜色、字体、间距等）
 │   └── control-base.css      # 控件基础样式
@@ -29,7 +30,7 @@ css/
 - **控件层**：具体的地图控件样式（仅包含控件本身，不含演示UI）
 - **工具层**：辅助类和特殊场景样式
 
-**注意**：本库不包含演示页面的样式（如控制面板、按钮等），演示样式在 `examples/styles/` 中独立维护。
+**注意**：本库不包含演示页面的样式（如控制面板、按钮等），演示样式在 `examples/assets/styles/` 中独立维护。
 
 ### 2. 命名规范
 - 使用 `lge-` 作为统一前缀（LeafletGISElements）
@@ -57,7 +58,7 @@ css/
 
 ### 引入样式
 ```html
-<link rel="stylesheet" href="path/to/controls.css">
+<link rel="stylesheet" href="path/to/leaflet-gis-elements.css">
 ```
 
 ### 自定义主题

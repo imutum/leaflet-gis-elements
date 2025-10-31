@@ -27,6 +27,7 @@
      * 初始化所有UI绑定
      */
     UIBindings.prototype.init = function () {
+        this.syncInitialState();
         this.bindStyleControls();
         this.bindVisibilityControls();
         this.bindMapInfoControls();
@@ -34,6 +35,192 @@
         this.bindExportControls();
 
         console.log('✓ UI绑定完成 - 使用MapController高级API');
+    };
+
+    /**
+     * 同步初始UI状态，使其与控制器当前配置保持一致
+     */
+    UIBindings.prototype.syncInitialState = function () {
+        this.applyVisibilityDefaults();
+        this.applyControlDefaults();
+        this.applyExportDefaults();
+    };
+
+    /**
+     * 应用控件显隐的默认状态
+     */
+    UIBindings.prototype.applyVisibilityDefaults = function () {
+        const visibility = this.controller.visibility || {};
+        this.setVisibilityDefaults('northArrow', visibility.northArrow, 'showNorthArrow', 'northArrowSection', 'northArrowToggle');
+        this.setVisibilityDefaults('scaleBar', visibility.scaleBar, 'showScaleBar', 'scaleBarSection', 'scaleBarToggle');
+        this.setVisibilityDefaults('legend', visibility.legend, 'showLegend', 'legendSection', 'legendToggle');
+        this.setVisibilityDefaults('graticule', visibility.graticule, 'showGraticule', 'graticuleSection', 'graticuleToggle');
+        this.setVisibilityDefaults('mapInfo', visibility.mapInfo, 'showMapInfo', 'mapInfoSection', 'mapInfoToggle');
+    };
+
+    /**
+     * 根据控制器数据设置具体控件的默认值
+     */
+    UIBindings.prototype.applyControlDefaults = function () {
+        const northArrow = this.controller.getControl('northArrow');
+        const scaleBar = this.controller.getControl('scaleBar');
+        const legend = this.controller.getControl('legend');
+        const mapInfo = this.controller.getControl('mapInfo');
+
+        if (northArrow) {
+            const size = typeof northArrow.getSize === 'function' ? northArrow.getSize() : northArrow.size;
+            if (typeof size === 'number' && !Number.isNaN(size)) {
+                FormBinder.setValue('northArrowSize', size);
+            }
+        }
+
+        if (scaleBar) {
+            const maxWidth = typeof scaleBar.getMaxWidth === 'function' ? scaleBar.getMaxWidth() : scaleBar.maxWidth;
+            if (typeof maxWidth === 'number' && !Number.isNaN(maxWidth)) {
+                FormBinder.setValue('scaleBarWidth', maxWidth);
+            }
+        }
+
+        if (legend) {
+            const maxWidth = typeof legend.getMaxWidth === 'function' ? legend.getMaxWidth() : legend.maxWidth;
+            const maxHeight = typeof legend.getMaxHeight === 'function' ? legend.getMaxHeight() : legend.maxHeight;
+
+            if (typeof maxWidth === 'number' && !Number.isNaN(maxWidth)) {
+                FormBinder.setValue('legendWidth', maxWidth);
+            }
+
+            if (typeof maxHeight === 'number' && !Number.isNaN(maxHeight)) {
+                FormBinder.setValue('legendHeight', maxHeight);
+            }
+        }
+
+        if (mapInfo) {
+            const info = typeof mapInfo.getInfo === 'function' ? mapInfo.getInfo() : null;
+            const showConfig = typeof mapInfo.getShowConfig === 'function' ? mapInfo.getShowConfig() : null;
+
+            if (info) {
+                FormBinder.setValue('mapTitle', info.title || '');
+                FormBinder.setValue('mapSubtitle', info.subtitle || '');
+                FormBinder.setValue('mapAuthor', info.author || '');
+                FormBinder.setValue('mapOrganization', info.organization || '');
+                FormBinder.setValue('mapDate', info.date || '');
+                FormBinder.setValue('mapDataSource', info.dataSource || '');
+                FormBinder.setValue('mapProjection', info.projection || '');
+                FormBinder.setValue('mapScaleText', info.scale || '');
+                FormBinder.setValue('mapNotes', info.notes || '');
+            }
+
+            if (showConfig) {
+                const showFieldMap = {
+                    title: 'showFieldTitle',
+                    subtitle: 'showFieldSubtitle',
+                    author: 'showFieldAuthor',
+                    organization: 'showFieldOrganization',
+                    date: 'showFieldDate',
+                    dataSource: 'showFieldDataSource',
+                    projection: 'showFieldProjection',
+                    scale: 'showFieldScale',
+                    notes: 'showFieldNotes'
+                };
+
+                Object.keys(showFieldMap).forEach(field => {
+                    if (showConfig[field] !== undefined) {
+                        FormBinder.setChecked(showFieldMap[field], !!showConfig[field]);
+                    }
+                });
+            }
+        }
+    };
+
+    /**
+     * 同步导出控件的默认值
+     */
+    UIBindings.prototype.applyExportDefaults = function () {
+        const exportControl = this.controller.getControl('exportPreview');
+        const exporterConfig = this.exporter && typeof this.exporter.getConfig === 'function'
+            ? this.exporter.getConfig()
+            : null;
+
+        if (exporterConfig) {
+            if (exporterConfig.format) {
+                FormBinder.setValue('exportFormat', exporterConfig.format);
+            }
+
+            if (exporterConfig.scale !== undefined) {
+                FormBinder.setValue('exportScale', String(exporterConfig.scale));
+            }
+
+            if (exporterConfig.quality !== undefined) {
+                FormBinder.setValue('exportQuality', exporterConfig.quality);
+                const qualityValueLabel = document.getElementById('qualityValue');
+                if (qualityValueLabel) {
+                    qualityValueLabel.textContent = String(exporterConfig.quality);
+                }
+                this.updateQualityRecommendation(exporterConfig.quality);
+            }
+
+            if (exporterConfig.filename) {
+                FormBinder.setValue('exportFilename', exporterConfig.filename);
+            }
+
+            if (exporterConfig.includeBasemap !== undefined) {
+                FormBinder.setChecked('exportIncludeBasemap', exporterConfig.includeBasemap);
+            }
+        }
+
+        if (exportControl) {
+            const boundsModeToRange = {
+                graticule: 'graticule',
+                viewport: 'viewport',
+                all: 'auto'
+            };
+            const rangeValue = boundsModeToRange[exportControl.boundsMode];
+            if (rangeValue) {
+                FormBinder.setValue('exportRange', rangeValue);
+            }
+        }
+
+        const visibility = this.controller.visibility || {};
+        const includeCheckboxMap = {
+            exportIncludeMapInfo: visibility.mapInfo !== false,
+            exportIncludeGraticule: visibility.graticule !== false,
+            exportIncludeLegend: visibility.legend !== false,
+            exportIncludeScaleBar: visibility.scaleBar !== false,
+            exportIncludeNorthArrow: visibility.northArrow !== false
+        };
+
+        Object.keys(includeCheckboxMap).forEach(function (checkboxId) {
+            FormBinder.setChecked(checkboxId, includeCheckboxMap[checkboxId]);
+        });
+    };
+
+    /**
+     * 设置控件的显示状态及对应的UI
+     * @param {string} controlName
+     * @param {boolean} visible
+     * @param {string} checkboxId
+     * @param {string} sectionId
+     * @param {string} toggleId
+     */
+    UIBindings.prototype.setVisibilityDefaults = function (controlName, visible, checkboxId, sectionId, toggleId) {
+        const isVisible = visible !== false;
+        if (checkboxId) {
+            FormBinder.setChecked(checkboxId, isVisible);
+        }
+
+        const section = sectionId ? document.getElementById(sectionId) : null;
+        if (section) {
+            section.style.display = isVisible ? 'block' : 'none';
+        }
+
+        const toggle = toggleId ? document.getElementById(toggleId) : null;
+        if (toggle) {
+            toggle.textContent = isVisible ? '▼' : '▶';
+        }
+
+        if (!isVisible) {
+            this.controller.hide(controlName);
+        }
     };
 
     // ==================== 1. 样式控制 ====================
@@ -96,8 +283,20 @@
         });
 
         // 设置当前样式为选中
-        const currentStyle = this.controller.controls[controlType]?.getStyle?.();
-        if (currentStyle) {
+        const control = this.controller.getControl(controlType) || this.controller.controls[controlType];
+        let currentStyle = null;
+
+        if (control) {
+            if (typeof control.getCurrentStyle === 'function') {
+                currentStyle = control.getCurrentStyle();
+            } else if (typeof control.getStyle === 'function') {
+                currentStyle = control.getStyle();
+            } else if (control.currentStyle) {
+                currentStyle = control.currentStyle;
+            }
+        }
+
+        if (currentStyle && styles.some(function (styleObj) { return styleObj.id === currentStyle; })) {
             select.value = currentStyle;
         }
     };
