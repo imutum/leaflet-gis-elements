@@ -350,10 +350,10 @@ class MapController {
 
         // 控件到CSS选择器的映射
         const selectorMap = {
-            northArrow: '.leaflet-control-north-arrow',
-            scaleBar: '.leaflet-control-scale-bar',
-            legend: '.leaflet-control-legend',
-            mapInfo: '.leaflet-control-map-info'
+            northArrow: '.lge-control-north-arrow',
+            scaleBar: '.lge-control-scale-bar',
+            legend: '.lge-control-legend',
+            mapInfo: '.lge-control-map-info'
         };
 
         // 添加UI控件到导出器

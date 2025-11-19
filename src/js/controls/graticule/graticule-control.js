@@ -64,7 +64,7 @@ class GraticuleControl extends L.GISElements.StylableControl {
      * 获取容器CSS类名
      */
     getContainerClass() {
-        return 'leaflet-control-graticule';
+        return 'lge-control-graticule';
     }
 
     /**

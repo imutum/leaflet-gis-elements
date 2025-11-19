@@ -167,17 +167,17 @@ const EXPORT_EXCLUDE_SELECTORS = [
     '.control-panel',
     '.toggle-panel',
     '.leaflet-control-attribution',
-    '.leaflet-control-export'
+    '.lge-control-export-preview'
 ];
 
 /**
  * 导出包含的控件选择器（白名单）
  */
 const EXPORT_INCLUDE_SELECTORS = [
-    '.leaflet-control-legend',
-    '.leaflet-control-scale-bar',
-    '.leaflet-control-north-arrow',
-    '.leaflet-control-graticule',
+    '.lge-control-legend',
+    '.lge-control-scale-bar',
+    '.lge-control-north-arrow',
+    '.lge-control-graticule',
     '.lge-graticule-frame',
     '.lge-graticule-label'
 ];

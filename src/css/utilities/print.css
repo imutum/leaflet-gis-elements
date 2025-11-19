@@ -6,14 +6,14 @@
 @media print {
 
     /* 控件定位调整 */
-    .leaflet-control-north-arrow,
-    .leaflet-control-scale-bar,
-    .leaflet-control-legend {
+    .lge-control-north-arrow,
+    .lge-control-scale-bar,
+    .lge-control-legend {
         position: static;
     }
 
     /* 地图注记打印优化 */
-    .leaflet-control-map-info {
+    .lge-control-map-info {
         background: white;
         box-shadow: none;
         border: 1px solid #333;

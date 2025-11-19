@@ -24,7 +24,7 @@ class NorthArrowControl extends L.GISElements.StylableControl {
      * 获取容器类名
      */
     getContainerClass() {
-        return 'leaflet-control-north-arrow';
+        return 'lge-control-north-arrow';
     }
 
     /**

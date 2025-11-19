@@ -318,9 +318,9 @@
             <div class="control-group">
                 <label for="exportRange"><strong>导出范围：</strong></label>
                 <select id="exportRange">
-                    <option value="graticule">🎯 经纬格网范围（推荐）</option>
-                    <option value="viewport">📺 当前视口范围</option>
-                    <option value="auto">🔍 自动识别（含所有要素）</option>
+                    <option value="auto" selected>🔍 自动识别</option>
+                    <option value="graticule">🎯 格网范围</option>
+                    <option value="viewport">📺 当前视口</option>
                 </select>
             </div>
 
@@ -342,7 +342,7 @@
                 <div>
                     <label for="exportFormat" style="font-size: 12px;"><strong>格式：</strong></label>
                     <select id="exportFormat" style="font-size: 12px; padding: 5px;">
-                        <option value="png">PNG</option>
+                        <option value="png" selected>PNG</option>
                         <option value="jpg">JPG</option>
                     </select>
                 </div>
@@ -409,13 +409,13 @@
 
     <!-- Demo 应用脚本 -->
     <script src="./examples/assets/js/config.js"></script>
-    
+
     <!-- 表单绑定工具 -->
     <script src="./examples/assets/js/form-binder.js"></script>
-    
+
     <!-- UI绑定（统一调用MapController高级API）-->
     <script src="./examples/assets/js/ui-bindings.js"></script>
-    
+
     <!-- Demo主逻辑 -->
     <script src="./examples/assets/js/demo.js"></script>
 </body>

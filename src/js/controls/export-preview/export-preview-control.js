@@ -26,7 +26,7 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
         // 边界设置
         this.exportBounds = options.exportBounds || null;
         this.autoCalculateBounds = options.autoCalculateBounds !== false;
-        this.boundsMode = options.boundsMode || 'graticule'; // 'graticule' | 'all' | 'viewport'
+        this.boundsMode = options.boundsMode || 'viewport'; // 'graticule' | 'all' | 'viewport'
 
         // 白名单
         this.layers = new Set();
@@ -44,7 +44,7 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
     }
 
     getContainerClass() {
-        return 'leaflet-control-export-preview';
+        return 'lge-control-export-preview';
     }
 
     getDefaultStyles() {
@@ -80,6 +80,8 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
         if (!this.exportBounds) {
             this.exportBounds = this.config.BOUNDS.DEFAULT_PREVIEW;
         }
+
+        this.exporter?.setExportBounds(this.exportBounds);
 
         this._createPreviewBorder();
         this.previewVisible = true;
@@ -361,6 +363,7 @@ class ExportPreviewControl extends L.GISElements.StylableControl {
 
     recalculateBounds() {
         this.exportBounds = this._calculateBounds();
+        this.exporter?.setExportBounds(this.exportBounds);
 
         if (this.previewBorder && this.exportBounds) {
             this._updateBorderStyle(this.exportBounds);

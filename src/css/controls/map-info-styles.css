@@ -4,7 +4,7 @@
  */
 
 /* ==================== 基础样式 ==================== */
-.leaflet-control-map-info {
+.lge-control-map-info {
     background: rgba(255, 255, 255, 0.95);
     border: 2px solid var(--lge-border-dark);
     border-radius: var(--lge-radius-md);
@@ -15,7 +15,7 @@
     user-select: none;
 }
 
-.leaflet-control-map-info:focus-visible {
+.lge-control-map-info:focus-visible {
     outline: var(--lge-focus-width) solid var(--lge-focus-color);
     outline-offset: var(--lge-focus-offset);
 }

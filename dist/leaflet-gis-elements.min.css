@@ -89,11 +89,11 @@
 
 /* ========== 通用控件基类 ========== */
 /* 移除 Leaflet 默认样式，使用自定义样式 */
-.leaflet-control-north-arrow,
-.leaflet-control-scale-bar,
-.leaflet-control-legend,
-.leaflet-control-graticule,
-.leaflet-control-map-info {
+.lge-control-north-arrow,
+.lge-control-scale-bar,
+.lge-control-legend,
+.lge-control-graticule,
+.lge-control-map-info {
     background: transparent;
     border: none;
     box-shadow: none;
@@ -110,11 +110,11 @@
 }
 
 /* 北箭头控件 */
-.leaflet-control-north-arrow {
+.lge-control-north-arrow {
     transition: opacity var(--lge-transition-base);
 }
 
-.leaflet-control-north-arrow:hover {
+.lge-control-north-arrow:hover {
     opacity: 0.9;
 }
 
@@ -132,8 +132,8 @@
 }
 
 /* 比例尺和图例控件 */
-.leaflet-control-scale-bar,
-.leaflet-control-legend {
+.lge-control-scale-bar,
+.lge-control-legend {
     background: transparent;
 }
 /**
@@ -564,7 +564,7 @@
  */
 
 /* 基础样式 */
-.leaflet-control-graticule {
+.lge-control-graticule {
     background: var(--lge-bg-white);
     border-radius: var(--lge-radius-md);
     box-shadow: var(--lge-shadow-md);
@@ -672,7 +672,7 @@
  */
 
 /* ==================== 基础样式 ==================== */
-.leaflet-control-map-info {
+.lge-control-map-info {
     background: rgba(255, 255, 255, 0.95);
     border: 2px solid var(--lge-border-dark);
     border-radius: var(--lge-radius-md);
@@ -683,7 +683,7 @@
     user-select: none;
 }
 
-.leaflet-control-map-info:focus-visible {
+.lge-control-map-info:focus-visible {
     outline: var(--lge-focus-width) solid var(--lge-focus-color);
     outline-offset: var(--lge-focus-offset);
 }
@@ -1003,8 +1003,8 @@
 @media (max-width: 768px) {
 
     /* 北箭头和比例尺 */
-    .leaflet-control-north-arrow,
-    .leaflet-control-scale-bar {
+    .lge-control-north-arrow,
+    .lge-control-scale-bar {
         font-size: var(--lge-font-size-sm);
     }
 
@@ -1015,7 +1015,7 @@
     }
 
     /* 地图注记 */
-    .leaflet-control-map-info {
+    .lge-control-map-info {
         max-width: 250px;
         font-size: 90%;
     }
@@ -1037,9 +1037,9 @@
 @media (max-width: 480px) {
 
     /* 可以添加更小屏幕的样式调整 */
-    .leaflet-control-north-arrow,
-    .leaflet-control-scale-bar,
-    .leaflet-control-legend {
+    .lge-control-north-arrow,
+    .lge-control-scale-bar,
+    .lge-control-legend {
         font-size: var(--lge-font-size-xs);
     }
 }
@@ -1051,14 +1051,14 @@
 @media print {
 
     /* 控件定位调整 */
-    .leaflet-control-north-arrow,
-    .leaflet-control-scale-bar,
-    .leaflet-control-legend {
+    .lge-control-north-arrow,
+    .lge-control-scale-bar,
+    .lge-control-legend {
         position: static;
     }
 
     /* 地图注记打印优化 */
-    .leaflet-control-map-info {
+    .lge-control-map-info {
         background: white;
         box-shadow: none;
         border: 1px solid #333;

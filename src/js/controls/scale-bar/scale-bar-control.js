@@ -34,7 +34,7 @@ class ScaleBarControl extends L.GISElements.StylableControl {
      * 获取容器类名
      */
     getContainerClass() {
-        return 'leaflet-control-scale-bar';
+        return 'lge-control-scale-bar';
     }
 
     /**

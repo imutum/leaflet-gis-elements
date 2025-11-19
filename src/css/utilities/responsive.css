@@ -7,8 +7,8 @@
 @media (max-width: 768px) {
 
     /* 北箭头和比例尺 */
-    .leaflet-control-north-arrow,
-    .leaflet-control-scale-bar {
+    .lge-control-north-arrow,
+    .lge-control-scale-bar {
         font-size: var(--lge-font-size-sm);
     }
 
@@ -19,7 +19,7 @@
     }
 
     /* 地图注记 */
-    .leaflet-control-map-info {
+    .lge-control-map-info {
         max-width: 250px;
         font-size: 90%;
     }
@@ -41,9 +41,9 @@
 @media (max-width: 480px) {
 
     /* 可以添加更小屏幕的样式调整 */
-    .leaflet-control-north-arrow,
-    .leaflet-control-scale-bar,
-    .leaflet-control-legend {
+    .lge-control-north-arrow,
+    .lge-control-scale-bar,
+    .lge-control-legend {
         font-size: var(--lge-font-size-xs);
     }
 }

@@ -14,56 +14,58 @@ class BoundsCalculator {
      * 自动计算包含格网和标签的边界
      */
     calculateGraticuleBounds(options = {}) {
-        const { padding = 10 } = options;
+        const { padding = 2 } = options;
 
         const graticuleFrame = document.querySelector('.lge-graticule-frame');
         const graticuleLabels = document.querySelectorAll('.lge-graticule-label');
+        const labelElements = Array.from(graticuleLabels).map(label => label.querySelector('span') || label);
+        const elements = [graticuleFrame, ...labelElements].filter(Boolean);
 
-        if (!graticuleFrame && graticuleLabels.length === 0) {
-            return null;
-        }
-
-        const mapContainer = this.map.getContainer();
-        const bounds = this._collectElementBounds(mapContainer, [
-            { element: graticuleFrame },
-            ...Array.from(graticuleLabels).map(label => ({
-                element: label,
-                useInnerSpan: true
-            }))
-        ]);
-
-        return this._addPadding(bounds, padding, mapContainer);
+        return this.calculateBoundsForElements(elements, { padding });
     }
 
     /**
      * 自动计算包含所有GIS元素的边界
      */
     calculateAllElementsBounds(options = {}) {
-        const { padding = 10, selectors = null } = options;
+        const { padding = 2, selectors = null } = options;
 
         const defaultSelectors = [
             '.lge-graticule-frame',
             '.lge-graticule-label',
-            '.leaflet-control-legend',
-            '.leaflet-control-scale-bar',
-            '.leaflet-control-north-arrow',
-            '.leaflet-control-map-info'
+            '.lge-control-legend',
+            '.lge-control-scale-bar',
+            '.lge-control-north-arrow',
+            '.lge-control-map-info'
         ];
 
         const mapContainer = this.map.getContainer();
-        const elements = (selectors || defaultSelectors)
+        const candidateElements = (selectors || defaultSelectors)
             .flatMap(selector => Array.from(mapContainer.querySelectorAll(selector)))
-            .filter(el => el.offsetParent !== null) // 过滤隐藏元素
-            .map(element => ({
-                element,
-                useInnerSpan: element.classList.contains('lge-graticule-label')
-            }));
+            .filter(el => el.offsetParent !== null); // 过滤隐藏元素
 
-        if (elements.length === 0) {
+        const elements = candidateElements
+            .map(element => element.classList.contains('lge-graticule-label')
+                ? (element.querySelector('span') || element)
+                : element)
+            .filter(Boolean);
+
+        return this.calculateBoundsForElements(elements, { padding, mapContainer });
+    }
+
+    /**
+     * 基础API：根据元素列表计算边界
+     */
+    calculateBoundsForElements(elements, options = {}) {
+        const { padding = 2, mapContainer = this.map.getContainer() } = options;
+        const normalizedElements = Array.from(elements || [])
+            .filter(element => element && typeof element.getBoundingClientRect === 'function');
+
+        if (normalizedElements.length === 0) {
             return null;
         }
 
-        const bounds = this._collectElementBounds(mapContainer, elements);
+        const bounds = this._collectElementBounds(mapContainer, normalizedElements);
         return this._addPadding(bounds, padding, mapContainer);
     }
 
@@ -104,14 +106,8 @@ class BoundsCalculator {
         let minX = Infinity, minY = Infinity;
         let maxX = -Infinity, maxY = -Infinity;
 
-        elements.forEach(({ element, useInnerSpan }) => {
-            if (!element) return;
-
-            const targetElement = useInnerSpan
-                ? (element.querySelector('span') || element)
-                : element;
-
-            const rect = targetElement.getBoundingClientRect();
+        elements.forEach(element => {
+            const rect = element.getBoundingClientRect();
             minX = Math.min(minX, rect.left - mapRect.left);
             minY = Math.min(minY, rect.top - mapRect.top);
             maxX = Math.max(maxX, rect.right - mapRect.left);

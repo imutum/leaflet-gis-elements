@@ -33,9 +33,9 @@ L.GISElements.ExportConfig = {
         GIS_ELEMENTS: [
             '.lge-graticule-frame',
             '.lge-graticule-label',
-            '.leaflet-control-legend',
-            '.leaflet-control-scale-bar',
-            '.leaflet-control-north-arrow'
+            '.lge-control-legend',
+            '.lge-control-scale-bar',
+            '.lge-control-north-arrow'
         ],
         GRATICULE: {
             FRAME: '.lge-graticule-frame',

@@ -47,7 +47,7 @@ class MapInfoControl extends L.GISElements.StylableControl {
     }
 
     getContainerClass() {
-        return 'leaflet-control-map-info';
+        return 'lge-control-map-info';
     }
 
     getDefaultStyles() {

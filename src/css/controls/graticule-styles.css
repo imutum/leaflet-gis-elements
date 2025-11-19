@@ -3,7 +3,7 @@
  */
 
 /* 基础样式 */
-.leaflet-control-graticule {
+.lge-control-graticule {
     background: var(--lge-bg-white);
     border-radius: var(--lge-radius-md);
     box-shadow: var(--lge-shadow-md);
